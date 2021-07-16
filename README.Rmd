@@ -32,10 +32,11 @@ devtools::install_github("astfalckl/exanalysis")
 
 ## Code run-through
 
-Let us first load <tt> exanalysis </tt>
+Let us first load <tt> exanalysis </tt> and some other dependencies.
 
 ```{r example}
 library(exanalysis)
+library(tidyverse)
 ```
 
 The package ships with a number of rds files that contain the data used in the paper. Namely, there is
@@ -45,11 +46,11 @@ The package ships with a number of rds files that contain the data used in the p
 These files are all lists that contain useful information to the analysis. The main contents of these lists are
 
 ```{r}
-pmip_sst$sst
+as_tibble(pmip_sst$sst)
 ```
 
 ```{r}
-margo_sst$data
+as_tibble(margo_sst$data)
 ```
 
 
