@@ -59,24 +59,6 @@ These files are all lists that contain useful information to the
 analysis. The main contents of these lists are
 
 ``` r
-as_tibble(pmip_sst$sst)
-#> # A tibble: 696,360 x 6
-#>      lat   lon  time   sst model       ice
-#>    <dbl> <dbl> <dbl> <dbl> <chr>     <dbl>
-#>  1 -73.8 -158.     1 -1.87 AWI_PMIP4 0.875
-#>  2 -73.8 -158.     2 -1.89 AWI_PMIP4 0.882
-#>  3 -73.8 -158.     3 -1.92 AWI_PMIP4 0.952
-#>  4 -73.8 -158.     4 -1.92 AWI_PMIP4 0.987
-#>  5 -73.8 -158.     5 -1.92 AWI_PMIP4 0.986
-#>  6 -73.8 -158.     6 -1.92 AWI_PMIP4 0.987
-#>  7 -73.8 -158.     7 -1.92 AWI_PMIP4 0.983
-#>  8 -73.8 -158.     8 -1.92 AWI_PMIP4 0.978
-#>  9 -73.8 -158.     9 -1.92 AWI_PMIP4 0.971
-#> 10 -73.8 -158.    10 -1.92 AWI_PMIP4 0.966
-#> # … with 696,350 more rows
-```
-
-``` r
 as_tibble(margo_sst$data)
 #> # A tibble: 766 x 7
 #>       lon   lat sst_obs reliability    sd source    type 
@@ -126,30 +108,52 @@ margo_sst$data %>%
 #> Loading required package: sp
 ```
 
-<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
-<!-- ```{r}
-p_data_proxy <- meas$data %>%
-  filter(source != "xavier") %>%
-  ggplot() +
-  geom_point(aes(x = lon, y = lat, shape = source), size = 0.8) + 
-  geom_polygon(
-    data = coastlines, 
-    aes(x = long, y = lat, group = group), 
-    fill = "white"
-  ) + 
-  geom_path(
-    data = coastlines, 
-    aes(x = long, y = lat, group = group), size = 0.3
-  ) + 
-  scale_shape_discrete("Proxy Type") +
-  scale_x_continuous(expand = c(0,0)) +
-  scale_y_continuous(expand = c(0,0)) +
-  xlab("Longitude") + 
-  ylab("Latitude") +
-  coord_fixed() +
-  theme_bw() +
-  theme(axis.text = element_text(size = 10), axis.title = element_text(size = 10))
-``` -->
+<img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
+
+``` r
+p_data_proxy <- margo_sst$data %>%
+  dplyr::filter(source != "xavier") %>%
+  ggplot2::ggplot() +
+      ggplot2::geom_point(aes(x = lon, y = lat, shape = source), size = 0.8) + 
+      ggplot2::geom_polygon(
+        data = coastlines, 
+        aes(x = long, y = lat, group = group), 
+        fill = "white"
+      ) + 
+      ggplot2::geom_path(
+        data = coastlines, 
+        aes(x = long, y = lat, group = group), size = 0.3
+      ) + 
+        ggplot2::scale_shape_discrete("Proxy Type") +
+        ggplot2::scale_x_continuous(expand = c(0,0)) +
+        ggplot2::scale_y_continuous(expand = c(0,0)) +
+        ggplot2::xlab("Longitude") + 
+        ggplot2::ylab("Latitude") +
+        ggplot2::coord_fixed() +
+        ggplot2::theme_bw() +
+        ggplot2::theme(
+            axis.text = ggplot2::element_text(size = 10), 
+            axis.title = ggplot2::element_text(size = 10)
+        )
+```
+
+``` r
+as_tibble(pmip_sst$sst)
+#> # A tibble: 696,360 x 6
+#>      lat   lon  time   sst model       ice
+#>    <dbl> <dbl> <dbl> <dbl> <chr>     <dbl>
+#>  1 -73.8 -158.     1 -1.87 AWI_PMIP4 0.875
+#>  2 -73.8 -158.     2 -1.89 AWI_PMIP4 0.882
+#>  3 -73.8 -158.     3 -1.92 AWI_PMIP4 0.952
+#>  4 -73.8 -158.     4 -1.92 AWI_PMIP4 0.987
+#>  5 -73.8 -158.     5 -1.92 AWI_PMIP4 0.986
+#>  6 -73.8 -158.     6 -1.92 AWI_PMIP4 0.987
+#>  7 -73.8 -158.     7 -1.92 AWI_PMIP4 0.983
+#>  8 -73.8 -158.     8 -1.92 AWI_PMIP4 0.978
+#>  9 -73.8 -158.     9 -1.92 AWI_PMIP4 0.971
+#> 10 -73.8 -158.    10 -1.92 AWI_PMIP4 0.966
+#> # … with 696,350 more rows
+```
 
 <!-- First thing is to generate the incidence matrices.
 

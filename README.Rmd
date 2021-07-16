@@ -49,10 +49,6 @@ The package ships with a number of rds files that contain the data used in the p
 These files are all lists that contain useful information to the analysis. The main contents of these lists are
 
 ```{r}
-as_tibble(pmip_sst$sst)
-```
-
-```{r}
 as_tibble(margo_sst$data)
 ```
 
@@ -86,29 +82,36 @@ margo_sst$data %>%
 	  	axis.title = ggplot2::element_text(size = 10)
 	  )
 ```
-<!-- ```{r}
-p_data_proxy <- meas$data %>%
-  filter(source != "xavier") %>%
-  ggplot() +
-  geom_point(aes(x = lon, y = lat, shape = source), size = 0.8) + 
-  geom_polygon(
-    data = coastlines, 
-    aes(x = long, y = lat, group = group), 
-    fill = "white"
-  ) + 
-  geom_path(
-    data = coastlines, 
-    aes(x = long, y = lat, group = group), size = 0.3
-  ) + 
-  scale_shape_discrete("Proxy Type") +
-  scale_x_continuous(expand = c(0,0)) +
-  scale_y_continuous(expand = c(0,0)) +
-  xlab("Longitude") + 
-  ylab("Latitude") +
-  coord_fixed() +
-  theme_bw() +
-  theme(axis.text = element_text(size = 10), axis.title = element_text(size = 10))
-``` -->
+```{r}
+p_data_proxy <- margo_sst$data %>%
+  dplyr::filter(source != "xavier") %>%
+  ggplot2::ggplot() +
+	  ggplot2::geom_point(aes(x = lon, y = lat, shape = source), size = 0.8) + 
+	  ggplot2::geom_polygon(
+	    data = coastlines, 
+	    aes(x = long, y = lat, group = group), 
+	    fill = "white"
+	  ) + 
+	  ggplot2::geom_path(
+	    data = coastlines, 
+	    aes(x = long, y = lat, group = group), size = 0.3
+	  ) + 
+		ggplot2::scale_shape_discrete("Proxy Type") +
+		ggplot2::scale_x_continuous(expand = c(0,0)) +
+		ggplot2::scale_y_continuous(expand = c(0,0)) +
+		ggplot2::xlab("Longitude") + 
+		ggplot2::ylab("Latitude") +
+		ggplot2::coord_fixed() +
+		ggplot2::theme_bw() +
+		ggplot2::theme(
+			axis.text = ggplot2::element_text(size = 10), 
+			axis.title = ggplot2::element_text(size = 10)
+		)
+```
+
+```{r}
+as_tibble(pmip_sst$sst)
+```
 
 <!-- First thing is to generate the incidence matrices.
 
