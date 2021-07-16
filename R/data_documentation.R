@@ -13,3 +13,10 @@
 #' @format A sst_sim object of PMIP outputs
 #' @source Go through and ref every object in here
 "margo_sst"
+
+#' Coastline shapefile
+#' 
+#' Shapefile of global coastlines for plotting.
+#' 
+#' @format a shapefile
+"coastlines"

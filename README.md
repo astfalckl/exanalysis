@@ -24,11 +24,13 @@ devtools::install_github("astfalckl/exanalysis")
 
 ## Code run-through
 
+# Update sea-surface temperature
+
 Let us first load <tt> exanalysis </tt> and some other dependencies.
 
 ``` r
-    library(exanalysis)
-    library(tidyverse)
+library(exanalysis)
+library(tidyverse)
 #> Warning: package 'tidyverse' was built under R version 3.6.2
 #> ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
 #> ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
@@ -57,7 +59,7 @@ These files are all lists that contain useful information to the
 analysis. The main contents of these lists are
 
 ``` r
-    as_tibble(pmip_sst$sst)
+as_tibble(pmip_sst$sst)
 #> # A tibble: 696,360 x 6
 #>      lat   lon  time   sst model       ice
 #>    <dbl> <dbl> <dbl> <dbl> <chr>     <dbl>
@@ -75,7 +77,7 @@ analysis. The main contents of these lists are
 ```
 
 ``` r
-    as_tibble(margo_sst$data)
+as_tibble(margo_sst$data)
 #> # A tibble: 766 x 7
 #>       lon   lat sst_obs reliability    sd source    type 
 #>     <dbl> <dbl>   <dbl>       <dbl> <dbl> <chr>     <chr>
@@ -92,12 +94,70 @@ analysis. The main contents of these lists are
 #> # … with 756 more rows
 ```
 
-First thing is to generate the incidence matrices.
-
 ``` r
-    H_list <- generate_H(pmip_sst, margo_sst)
+margo_sst$data %>%
+  ggplot() +
+    ggplot2::geom_point(aes(x = lon, y = lat, color = sst_obs), size = 0.5) + 
+      ggplot2::geom_polygon(
+        data = coastlines, 
+        aes(x = long, y = lat, group = group), 
+        fill = "white"
+      ) + 
+      ggplot2::geom_path(
+        data = coastlines, 
+        aes(x = long, y = lat, group = group), size = 0.3
+      ) + 
+      scico::scale_color_scico(
+        expression(degree~"C"), direction = -1, palette = "roma"
+      ) +
+      ggplot2::scale_x_continuous(expand = c(0,0)) +
+      ggplot2::scale_y_continuous(expand = c(0,0)) +
+      ggplot2::xlab("Longitude") + 
+      ggplot2::ylab("Latitude") +
+      ggplot2::coord_fixed() +
+      ggplot2::theme_bw() +
+      ggplot2::guides(
+        fill = ggplot2::guide_colourbar(barwidth = 0.5, barheight = 4)
+      ) +
+      ggplot2::theme(
+        axis.text = ggplot2::element_text(size = 10), 
+        axis.title = ggplot2::element_text(size = 10)
+      )
+#> Loading required package: sp
+```
+
+<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
+<!-- ```{r}
+p_data_proxy <- meas$data %>%
+  filter(source != "xavier") %>%
+  ggplot() +
+  geom_point(aes(x = lon, y = lat, shape = source), size = 0.8) + 
+  geom_polygon(
+    data = coastlines, 
+    aes(x = long, y = lat, group = group), 
+    fill = "white"
+  ) + 
+  geom_path(
+    data = coastlines, 
+    aes(x = long, y = lat, group = group), size = 0.3
+  ) + 
+  scale_shape_discrete("Proxy Type") +
+  scale_x_continuous(expand = c(0,0)) +
+  scale_y_continuous(expand = c(0,0)) +
+  xlab("Longitude") + 
+  ylab("Latitude") +
+  coord_fixed() +
+  theme_bw() +
+  theme(axis.text = element_text(size = 10), axis.title = element_text(size = 10))
+``` -->
+
+<!-- First thing is to generate the incidence matrices.
+
+
+```r
+H_list <- generate_H(pmip_sst, margo_sst)
 #> Calculating Hs...Calculating Ht...Calculating H...
-    utils::str(H_list)
+utils::str(H_list)
 #> List of 4
 #>  $ Hs         :Formal class 'dgeMatrix' [package "Matrix"] with 4 slots
 #>   .. ..@ x       : num [1:6350140] 2.77e-09 -2.71e-10 -2.40e-12 -1.01e-07 9.10e-11 ...
@@ -128,19 +188,23 @@ First thing is to generate the incidence matrices.
 #>   .. ..@ factors : list()
 ```
 
-Then we optimise our loss to get an estimate of the variance parameters
-\(\alpha\) and \(\kappa\). (This is being loaded from memory in the
-background so I don’t have to wait for the fitting proceedure when I’m
-rendering the README)
+Then we optimise our loss to get an estimate of the variance parameters $\alpha$ and $\kappa$. (This is being loaded from memory in the background so I don't have to wait for the fitting procedure when I'm rendering the README)
 
-``` r
-    params_hat <- train_params(sst_model, meas, H_list)
+
+```r
+params_hat <- train_params(sst_model, meas, H_list)
 ```
 
-``` r
+
+
+
+```r
 params_hat
 #> # A tibble: 1 x 4
 #>     tau alpha kappa  beta
 #>   <dbl> <dbl> <dbl> <dbl>
 #> 1     6 0.921  1.61     1
 ```
+ -->
+
+# Update sea-ice concentration

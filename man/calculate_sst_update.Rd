@@ -4,7 +4,7 @@
 \alias{calculate_sst_update}
 \title{Calculate the SST update}
 \usage{
-calculate_sst_update(simulation, proxy, H_list, params, varM = NULL)
+calculate_sst_update(simulation, proxy, H_list, params, incl_varM = NULL)
 }
 \arguments{
 \item{simulation}{a sst_sim object containing the sst simulations}
@@ -16,7 +16,7 @@ incidence matrices}
 
 \item{params}{fit parameters from train_params()}
 
-\item{varM}{}
+\item{incl_varM}{include the varM matrix in the calculation}
 }
 \value{
 Returns loss
