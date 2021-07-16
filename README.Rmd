@@ -40,13 +40,17 @@ library(exanalysis)
 
 The package ships with a number of rds files that contain the data used in the paper. Namely, there is
 	* <tt> pmip_sst </tt> that contains the simulation outputs of SST,
-	* <tt> margo_sst </tt> that contains proxy reconstructions of SST (note there are some added points to the original MARGO dataset).
+	* <tt> margo_sst </tt> that contains proxy reconstructions of SST (note there are some added points to the original MARGO dataset). 
+
+These files are all lists that contain useful information to the analysis. The main contents of these lists are
 
 ```{r}
-pmip_sst
+pmip_sst$sst
 ```
 
 ```{r}
-margo_sst
+margo_sst$data
 ```
+
+
 
