@@ -27,8 +27,8 @@ devtools::install_github("astfalckl/exanalysis")
 Let us first load <tt> exanalysis </tt> and some other dependencies.
 
 ``` r
-library(exanalysis)
-library(tidyverse)
+    library(exanalysis)
+    library(tidyverse)
 #> Warning: package 'tidyverse' was built under R version 3.6.2
 #> ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
 #> ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
@@ -57,7 +57,7 @@ These files are all lists that contain useful information to the
 analysis. The main contents of these lists are
 
 ``` r
-as_tibble(pmip_sst$sst)
+    as_tibble(pmip_sst$sst)
 #> # A tibble: 696,360 x 6
 #>      lat   lon  time   sst model       ice
 #>    <dbl> <dbl> <dbl> <dbl> <chr>     <dbl>
@@ -75,7 +75,7 @@ as_tibble(pmip_sst$sst)
 ```
 
 ``` r
-as_tibble(margo_sst$data)
+    as_tibble(margo_sst$data)
 #> # A tibble: 766 x 7
 #>       lon   lat sst_obs reliability    sd source    type 
 #>     <dbl> <dbl>   <dbl>       <dbl> <dbl> <chr>     <chr>
@@ -95,9 +95,9 @@ as_tibble(margo_sst$data)
 First thing is to generate the incidence matrices.
 
 ``` r
-H_list <- generate_H(pmip_sst, margo_sst)
+    H_list <- generate_H(pmip_sst, margo_sst)
 #> Calculating Hs...Calculating Ht...Calculating H...
-utils::str(H_list)
+    utils::str(H_list)
 #> List of 4
 #>  $ Hs         :Formal class 'dgeMatrix' [package "Matrix"] with 4 slots
 #>   .. ..@ x       : num [1:6350140] 2.77e-09 -2.71e-10 -2.40e-12 -1.01e-07 9.10e-11 ...
@@ -126,4 +126,21 @@ utils::str(H_list)
 #>   .. .. ..$ : NULL
 #>   .. .. ..$ : NULL
 #>   .. ..@ factors : list()
+```
+
+Then we optimise our loss to get an estimate of the variance parameters
+\(\alpha\) and \(\kappa\). (This is being loaded from memory in the
+background so I don’t have to wait for the fitting proceedure when I’m
+rendering the README)
+
+``` r
+    params_hat <- train_params(sst_model, meas, H_list)
+```
+
+``` r
+params_hat
+#> # A tibble: 1 x 4
+#>     tau alpha kappa  beta
+#>   <dbl> <dbl> <dbl> <dbl>
+#> 1     6 0.921  1.61     1
 ```
