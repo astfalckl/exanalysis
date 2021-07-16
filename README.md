@@ -52,8 +52,9 @@ library(tidyverse)
 The package ships with a number of rds files that contain the data used
 in the paper. Namely, there is
 
-    * <tt> pmip_sst </tt> that contains the simulation outputs of SST,
-    * <tt> margo_sst </tt> that contains proxy reconstructions of SST (note there are some added points to the original MARGO dataset). 
+  - <tt> pmip\_sst </tt> that contains the simulation outputs of SST,
+  - <tt> margo\_sst </tt> that contains proxy reconstructions of SST
+    (note there are some added points to the original MARGO dataset).
 
 These files are all lists that contain useful information to the
 analysis. The main contents of these lists are
@@ -111,7 +112,7 @@ margo_sst$data %>%
 <img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
 
 ``` r
-p_data_proxy <- margo_sst$data %>%
+margo_sst$data %>%
   dplyr::filter(source != "xavier") %>%
   ggplot2::ggplot() +
       ggplot2::geom_point(aes(x = lon, y = lat, shape = source), size = 0.8) + 
@@ -136,6 +137,8 @@ p_data_proxy <- margo_sst$data %>%
             axis.title = ggplot2::element_text(size = 10)
         )
 ```
+
+<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
 
 ``` r
 as_tibble(pmip_sst$sst)
