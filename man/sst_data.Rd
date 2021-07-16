@@ -7,7 +7,7 @@
 sst_data(object)
 }
 \arguments{
-\item{object}{List with elements XYZ}
+\item{object}{list with elements XYZ}
 }
 \value{
 Returns a sst_data object

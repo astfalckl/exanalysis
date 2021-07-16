@@ -2,7 +2,13 @@
 
 S3method(print,sst_data)
 S3method(print,sst_sim)
+export("%>%")
+export(generate_H)
 export(new_sst_data)
 export(new_sst_sim)
+export(parameter_loss)
 export(sst_data)
 export(sst_sim)
+export(train_params)
+export(wendland)
+importFrom(magrittr,"%>%")

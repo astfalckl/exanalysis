@@ -4,10 +4,12 @@
 \alias{print.sst_data}
 \title{Print function for sst_data object}
 \usage{
-\method{print}{sst_data}(object)
+\method{print}{sst_data}(x, ...)
 }
 \arguments{
-\item{object}{sst_data object}
+\item{x}{sst_data object}
+
+\item{...}{further arguments passed to or from other methods.}
 }
 \value{
 Prints sst_data object

@@ -12,11 +12,11 @@
 #' This is currently negative log-likelihood, investigate using bias-variance
 #'
 #' @param params C4-Wendland parameters
-#' @param error Error vector
-#' @param D Data
-#' @param varB Bias variance
-#' @param noise Observation error
-#' @param Hs Spatial incidence matrix
+#' @param error error vector
+#' @param D data
+#' @param varB bias variance
+#' @param noise observation error
+#' @param Hs spatial incidence matrix
 #'
 #' @return Returns loss
 #' @export
@@ -43,7 +43,10 @@ parameter_loss <- function(params, error, D, varB, noise, Hs){
 #' 
 #' This creates the object that holds the sst_data results, i.e., the Z
 #'
-#' @param object List with elements XYZ
+#' @param simulation a sst_sim object containing the sst simulations
+#' @param proxy a sst_data object containing the proxy data
+#' @param H_list the output from generate_H() containing a list of the 
+#' incidence matrices
 #'
 #' @return Returns a sst_data object
 #' @export
@@ -53,12 +56,12 @@ train_params <- function(simulation, proxy, H_list){
 	HM <- H_list$H %*% as.matrix(simulation$means$sst)
 	B <- proxy$B
 
-  D <- rdist.earth(as.matrix(simulation$coords), R = 1) 
+  D <- fields::rdist.earth(as.matrix(simulation$coords), R = 1) 
 	error <- as.numeric(Z - HM - B)
 
 	Hs_collapse <- H_list$Hs_collapse
 
-	params_optim <- optim(
+	params_optim <- stats::optim(
 	  c(log(2), log(1)), parameter_loss, 
 	  gr = NULL, error, D, proxy$varB, proxy$data$sd^2, Hs_collapse
 	)
@@ -69,7 +72,7 @@ train_params <- function(simulation, proxy, H_list){
 	beta2 <- 1
 
 	return(
-		tibble(
+		dplyr::tibble(
 			tau = tau, alpha = alpha, kappa = kappa, beta2 = beta2
 		)
 	)

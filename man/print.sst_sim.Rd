@@ -4,10 +4,12 @@
 \alias{print.sst_sim}
 \title{Print function for sst_sim object}
 \usage{
-\method{print}{sst_sim}(object)
+\method{print}{sst_sim}(x, ...)
 }
 \arguments{
-\item{object}{sst_sim object}
+\item{x}{sst_sim object}
+
+\item{...}{further arguments passed to or from other methods.}
 }
 \value{
 Prints sst_sim object

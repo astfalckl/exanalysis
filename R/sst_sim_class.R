@@ -30,10 +30,11 @@ new_sst_sim <- function(object){
 
 #' Print function for sst_sim object
 #'
-#' @param object sst_sim object
+#' @param x sst_sim object
+#' @param ... further arguments passed to or from other methods.
 #'
 #' @return Prints sst_sim object
 #' @export
-print.sst_sim <- function(object){
-  utils::str(object)
+print.sst_sim <- function(x, ...){
+  utils::str(x)
 }

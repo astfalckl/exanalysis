@@ -3,7 +3,7 @@
 #' 
 #' This creates the object that holds the sst_data results, i.e., the Z
 #'
-#' @param object List with elements XYZ
+#' @param object list with elements XYZ
 #'
 #' @return Returns a sst_data object
 #' @export
@@ -30,10 +30,11 @@ new_sst_data <- function(object){
 
 #' Print function for sst_data object
 #'
-#' @param object sst_data object
+#' @param x sst_data object
+#' @param ... further arguments passed to or from other methods.
 #'
 #' @return Prints sst_data object
 #' @export
-print.sst_data <- function(object){
-  utils::str(object)
+print.sst_data <- function(x, ...){
+  utils::str(x)
 }

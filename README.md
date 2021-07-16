@@ -48,10 +48,10 @@ library(tidyverse)
 ```
 
 The package ships with a number of rds files that contain the data used
-in the paper. Namely, there is \* <tt> pmip\_sst </tt> that contains the
-simulation outputs of SST, \* <tt> margo\_sst </tt> that contains proxy
-reconstructions of SST (note there are some added points to the original
-MARGO dataset).
+in the paper. Namely, there is
+
+    * <tt> pmip_sst </tt> that contains the simulation outputs of SST,
+    * <tt> margo_sst </tt> that contains proxy reconstructions of SST (note there are some added points to the original MARGO dataset). 
 
 These files are all lists that contain useful information to the
 analysis. The main contents of these lists are
@@ -90,4 +90,40 @@ as_tibble(margo_sst$data)
 #>  9 -57.5  58.4    -0.29           1   1.5 Dinocysts ann  
 #> 10 -63.1  42.6     6.36           1   1.5 Dinocysts ann  
 #> # … with 756 more rows
+```
+
+First thing is to generate the incidence matrices.
+
+``` r
+H_list <- generate_H(pmip_sst, margo_sst)
+#> Calculating Hs...Calculating Ht...Calculating H...
+utils::str(H_list)
+#> List of 4
+#>  $ Hs         :Formal class 'dgeMatrix' [package "Matrix"] with 4 slots
+#>   .. ..@ x       : num [1:6350140] 2.77e-09 -2.71e-10 -2.40e-12 -1.01e-07 9.10e-11 ...
+#>   .. ..@ Dim     : int [1:2] 766 8290
+#>   .. ..@ Dimnames:List of 2
+#>   .. .. ..$ : NULL
+#>   .. .. ..$ : NULL
+#>   .. ..@ factors : list()
+#>  $ Hs_collapse: num [1:766, 1:4145] 2.77e-09 -2.71e-10 -2.40e-12 -1.01e-07 9.10e-11 ...
+#>   ..- attr(*, "dimnames")=List of 2
+#>   .. ..$ : NULL
+#>   .. ..$ : NULL
+#>  $ Ht         :Formal class 'dgCMatrix' [package "Matrix"] with 6 slots
+#>   .. ..@ i       : int [1:62175] 0 4145 0 4145 0 4145 0 0 0 0 ...
+#>   .. ..@ p       : int [1:49741] 0 2 4 6 7 8 9 10 11 12 ...
+#>   .. ..@ Dim     : int [1:2] 8290 49740
+#>   .. ..@ Dimnames:List of 2
+#>   .. .. ..$ : NULL
+#>   .. .. ..$ : NULL
+#>   .. ..@ x       : num [1:62175] 0.0833 0.3333 0.0833 0.3333 0.0833 ...
+#>   .. ..@ factors : list()
+#>  $ H          :Formal class 'dgeMatrix' [package "Matrix"] with 4 slots
+#>   .. ..@ x       : num [1:38100840] 2.31e-10 -2.26e-11 -2.00e-13 -8.44e-09 7.58e-12 ...
+#>   .. ..@ Dim     : int [1:2] 766 49740
+#>   .. ..@ Dimnames:List of 2
+#>   .. .. ..$ : NULL
+#>   .. .. ..$ : NULL
+#>   .. ..@ factors : list()
 ```

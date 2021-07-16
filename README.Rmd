@@ -40,6 +40,7 @@ library(tidyverse)
 ```
 
 The package ships with a number of rds files that contain the data used in the paper. Namely, there is
+
 	* <tt> pmip_sst </tt> that contains the simulation outputs of SST,
 	* <tt> margo_sst </tt> that contains proxy reconstructions of SST (note there are some added points to the original MARGO dataset). 
 
@@ -52,6 +53,27 @@ as_tibble(pmip_sst$sst)
 ```{r}
 as_tibble(margo_sst$data)
 ```
+
+First thing is to generate the incidence matrices. (This takes a while to run so it currently executes by reading the file <tt> H_list </tt> in from the package)
+
+```{r}
+H_list <- generate_H(pmip_sst, margo_sst)
+utils::str(H_list)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
