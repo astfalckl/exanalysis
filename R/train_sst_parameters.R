@@ -4,6 +4,8 @@
 # ------------------------------------------------------------------------------
 
 # Update parameter_loss
+# What is this beta = TBD thing?
+# Add in varM
 
 # ------------------------------------------------------------------------------
 
@@ -26,13 +28,13 @@ parameter_loss <- function(params, error, D, varB, noise, Hs){
   alpha <- exp(params[1]) + 1/pi # constrains alpha > 1/pi
   kappa <- sqrt(exp(params[2])) # constrains kappa > 0
 
-  cat(sprintf("\n Kappa = %f : Alpha = %f : Beta = TBD", kappa, alpha))
+  cat(sprintf("\r Kappa = %f : Alpha = %f : Beta = TBD", kappa, alpha))
 
   sigma <- Matrix::Matrix(wendland(D, tau, alpha, kappa, 1e-06))
   sigma <- Hs %*% (sigma) %*% t(Hs) + varB + diag(noise)
 
   llike <- -1/2 * as.numeric(
-    as.numeric(determinant(sigma)$modulus) + 
+    as.numeric(Matrix::determinant(sigma)$modulus) + 
     t(as.matrix(error)) %*% solve(sigma) %*% as.matrix(error)
   )
   

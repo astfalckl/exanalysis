@@ -29,7 +29,6 @@ generate_H <- function(simulation, proxy){
 
   Kx <- kappa_hat^2 * wendland(Dx, tau_hat, alpha_hat, 1)
 
-# HACK@astfalck the package doesn't like t() on a Matrix object for some reason?
   Hs_tmp <- t(as.matrix(solve(K) %*% Kx))
 
   n_ann <- proxy$data %>% dplyr::filter(type == "ann") %>% nrow()

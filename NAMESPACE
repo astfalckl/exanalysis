@@ -3,6 +3,7 @@
 S3method(print,sst_data)
 S3method(print,sst_sim)
 export("%>%")
+export(calculate_sst_update)
 export(generate_H)
 export(new_sst_data)
 export(new_sst_sim)

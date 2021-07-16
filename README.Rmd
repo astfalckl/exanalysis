@@ -35,8 +35,8 @@ devtools::install_github("astfalckl/exanalysis")
 Let us first load <tt> exanalysis </tt> and some other dependencies.
 
 ```{r example}
-library(exanalysis)
-library(tidyverse)
+	library(exanalysis)
+	library(tidyverse)
 ```
 
 The package ships with a number of rds files that contain the data used in the paper. Namely, there is
@@ -47,19 +47,40 @@ The package ships with a number of rds files that contain the data used in the p
 These files are all lists that contain useful information to the analysis. The main contents of these lists are
 
 ```{r}
-as_tibble(pmip_sst$sst)
+	as_tibble(pmip_sst$sst)
 ```
 
 ```{r}
-as_tibble(margo_sst$data)
+	as_tibble(margo_sst$data)
 ```
 
-First thing is to generate the incidence matrices. (This takes a while to run so it currently executes by reading the file <tt> H_list </tt> in from the package)
+First thing is to generate the incidence matrices.
 
 ```{r}
-H_list <- generate_H(pmip_sst, margo_sst)
-utils::str(H_list)
+	H_list <- generate_H(pmip_sst, margo_sst)
+	utils::str(H_list)
 ```
+
+Then we optimise our loss to get an estimate of the variance parameters $\alpha$ and $\kappa$. (This is being loaded from memory in the background so I don't have to wait for the fitting proceedure when I'm rendering the README)
+
+```{r, eval = FALSE}
+	params_hat <- train_params(sst_model, meas, H_list)
+```
+
+```{r, echo = FALSE}
+	params_hat <- tibble(
+		tau = 6,
+		alpha = 0.921,
+		kappa = 1.61,
+		beta = 1
+	)
+```
+
+```{r}
+params_hat
+```
+
+
 
 
 
