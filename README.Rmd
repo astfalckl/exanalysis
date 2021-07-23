@@ -22,7 +22,7 @@ knitr::opts_chunk$set(
 
 This is the accompanying package to "Reconstruction of sea-surface temperature and sea-ice concentration via exchangeability analysis".
 
-## Installation
+# Installation
 
 You can install <tt> exanalysis </tt> direct from GitHub:
 
@@ -30,9 +30,9 @@ You can install <tt> exanalysis </tt> direct from GitHub:
 devtools::install_github("astfalckl/exanalysis")
 ```
 
-## Code run-through
+# Code run-through
 
-# Update sea-surface temperature
+## Update sea-surface temperature
 
 Let us first load <tt> exanalysis </tt> and some other dependencies.
 
@@ -52,7 +52,7 @@ These files are all lists that contain useful information to the analysis. The m
 as_tibble(margo_sst$data)
 ```
 
-```{r}
+```{r, echo = FALSE}
 margo_sst$data %>%
   ggplot() +
     ggplot2::geom_point(aes(x = lon, y = lat, color = sst_obs), size = 0.5) + 
@@ -82,7 +82,7 @@ margo_sst$data %>%
 	  	axis.title = ggplot2::element_text(size = 10)
 	  )
 ```
-```{r}
+```{r, echo = FALSE}
 margo_sst$data %>%
   dplyr::filter(source != "xavier") %>%
   ggplot2::ggplot() +
@@ -139,7 +139,7 @@ params_hat <- tibble(
 params_hat
 ```
  -->
-# Update sea-ice concentration
+## Update sea-ice concentration
 
 
 

@@ -17,9 +17,11 @@ Imports:
     dplyr,
     fields,
     ggplot2,
+    irlba,
     magrittr,
     Matrix,
     scico,
+    splines2,
     stats,
     utils
 Depends: 

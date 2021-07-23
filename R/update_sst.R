@@ -17,16 +17,16 @@ calculate_sst_update <- function(simulation, proxy, H_list, params, incl_varM = 
 
 	cat(sprintf("\rSetting up bits...         "))
 
-	varS <- rdist.earth(as.matrix(simulation$coords), R = 1) %>% 
+	varS <- fields::rdist.earth(as.matrix(simulation$coords), R = 1) %>% 
 	  wendland(params$tau, params$alpha, params$kappa, 1e-06) %>%
-	  Matrix()
+	  Matrix::Matrix()
 
-	varT <- Matrix(1, nrow = simulation$ntime, ncol = simulation$ntime)
+	varT <- Matrix::Matrix(1, nrow = simulation$ntime, ncol = simulation$ntime)
 
-	M <- Matrix(simulation$means$sst)
-	D <- Diagonal(proxy$n, proxy$data$sd^2)
+	M <- Matrix::Matrix(simulation$means$sst)
+	D <- Matrix::Diagonal(proxy$n, proxy$data$sd^2)
 
-	M_scale <- params$beta2/(simulation$m + params$beta2)
+	M_scale <- params$beta/(simulation$m + params$beta)
 
 	varYS <- varS # + M_scale * varM
 
@@ -38,19 +38,21 @@ calculate_sst_update <- function(simulation, proxy, H_list, params, incl_varM = 
 
 	HvarYH <- H_list$Hs %*% 
 		kronecker(matrix(1, nrow = 2, ncol = 2), varYS) %*% 
-		t(H_list$Hs)
+		Matrix::t(H_list$Hs)
 
 	HsvarYs <- H_list$Hs %*% rbind(varYS, varYS)
 
 	solveU <- solve(HvarYH + proxy$varB + D)
 
-	error <- as.numeric(Z - HM - proxy$B)
+	HM <- H_list$H %*% as.matrix(simulation$means$sst)
+
+	error <- as.numeric(matrix(proxy$data$sst_obs) - HM - proxy$B)
 
 	cat(sprintf("\rCalculating updates...     "))
 
-	E <- M + t(HvarY) %*% solveU %*% as.matrix(error)
+	E <- M + Matrix::t(HvarY) %*% solveU %*% as.matrix(error)
 
-	Vs <- varYS - t(HsvarYs) %*% solveU %*% HsvarYs
+	Vs <- varYS - Matrix::t(HsvarYs) %*% solveU %*% HsvarYs
 	Vt <- varT
 
 	return(
