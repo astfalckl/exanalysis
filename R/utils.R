@@ -32,7 +32,7 @@ plot_spline_basis <- function(spline_object){
   spline_object %>% 
     dplyr::as_tibble() %>%
     dplyr::mutate(x = x) %>%
-    dplyr::gather(spline, value, -x) %>%
+    tidyr::gather(spline, value, -x) %>%
     ggplot2::ggplot() + 
       ggplot2::geom_line(aes(x = x, y = value, colour = spline)) +
       ggplot2::theme_bw()
@@ -48,16 +48,85 @@ plot_spline_basis <- function(spline_object){
 #'
 #' @return a spline basis design matrix
 #' @export
-calc_X <- function(x_in, boundary, knots, degree){
+calc_X <- function(x_in, spline_params){
+
+  bounds <- spline_params$bounds
+  knots <- spline_params$knots
+  degree <- spline_params$degree
 
   spline <- (- splines2::iSpline(
         x_in, 
         knot = knots, degree = degree, intercept = TRUE, 
-        Boundary.knots = boundary
+        Boundary.knots = bounds
     )) + 1
 
   attr(spline, "x") <- x_in
-  attr(spline, "boundary") <- boundary
+  attr(spline, "boundary") <- bounds
 
   spline
 }
+
+#' Calculates the I-spline design matrix from a design
+#'
+#' @param x_in the inputs at which the basis is to be evaluated
+#' @param boundary the boundary points
+#' @param knots the knot locations
+#' @param degree the spline degree
+#'
+#' @return a spline basis design matrix
+#' @export
+fit_spline <- function(sst, ice, spline_params){
+  
+  X <- calc_X(sst, spline_params)
+
+  beta <- exp(
+    optim(
+      log(spline_params$prior_exp+0.001), 
+      loss, 
+      gr = NULL, 
+      X, ice, spline_params$prior_exp
+    )$par
+  )
+  
+  return(tibble(beta = beta, idx = 1:5))
+
+}
+
+loss <- function(log_beta, X, ice, priors){
+  beta <- exp(log_beta)
+  sum((X %*% beta - ice)^2) + 0.05 * sum((beta - priors)^2)
+}
+
+calc_ice <- function(spline_params, sst_value, betas){
+
+  if (sst_value > spline_params$bounds[2]){
+
+    return(0)
+
+  } else if (sst_value < spline_params$bounds[1]){
+
+    return(1)
+
+  } else{
+
+    X <- calc_X(sst_value, spline_params)
+    betas <- as.matrix(betas)
+
+    as.numeric(X %*% betas)
+
+  }
+
+}
+
+# priors <- c(0.05, 0.7, 0.15, 0.01, 0.01)
+
+# bench::mark(optim(log(priors), loss, gr = NULL, X, ice, priors)$par)
+# bench::mark(nnls(X, tmp$ice)$x)
+
+
+
+
+
+
+
+

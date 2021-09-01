@@ -7,9 +7,17 @@
 #'
 #' @return Returns a sst_data object
 #' @export
-sst_data <- function(object){
-	
-	obj_names <- names(object)
+create_sst_data_object <- function(
+  data, coords, B = NULL, varB = NULL
+){
+  
+  n <- nrow(data)
+
+  if(is.null(B)) {B <- matrix(0, nrow = n)}
+
+  if(is.null(varB)) {varB <- Matrix(matrix(0, nrow = n, ncol = n))}
+
+  object <- list(data = data, coords = coords, B = B, varB = varB, n = n)
 
   new_sst_data(object)
 

@@ -7,9 +7,14 @@
 #'
 #' @return Returns a sst_sim object
 #' @export
-sst_sim <- function(object){
-	
-	obj_names <- names(object)
+create_sst_sim_object <- function(data, means, coords){
+  
+  n <- nrow(coords)
+  ntime <- unique(data$time) %>% length()
+  m <- unique(data$model) %>% length()
+
+  object <- list(sst = data, means = means, coords = coords, n = n, 
+    ntime = ntime, m = m)
 
   new_sst_sim(object)
 
