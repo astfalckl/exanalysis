@@ -2,8 +2,6 @@
 output: github_document
 ---
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -15,22 +13,19 @@ knitr::opts_chunk$set(
 
 # Coexchangeable process modelling for uncertainty quantification in joint climate reconstruction
 
-<!-- badges: start -->
-<!-- badges: end -->
-
-This is the accompanying package to "Coexchangeable process modelling for uncertainty quantification in joint climate reconstruction". This <tt>.rmd</tt> file pulls some results from pre-computed results; to run the analysis from scratch look in <tt>run_analysis.R</tt>.
+This is the accompanying package to "Coexchangeable process modelling for uncertainty quantification in joint climate reconstruction". This <tt>.rmd</tt> file pre-computes some results; to run the analysis from scratch look in <tt>run_analysis.R</tt>.
 
 # Installation
 
 To execute on your local machine you can install <tt>exanalysis</tt> direct from GitHub:
 
-``` r
+```{r eval = FALSE}
 devtools::install_github("astfalckl/exanalysis")
 ```
 
 and load <tt> exanalysis </tt>.
 
-```{r warning = FALSE}
+```{r warning = FALSE, message = FALSE}
 library(exanalysis)
 ```
 
@@ -42,107 +37,13 @@ library(tidyverse)
 
 The package ships with a number of <tt>.rds</tt> files that contain the data used in the paper. Namely,
 
-* <tt>model_data</tt> that contains the simulation outputs of SST,
-* <tt>sst_data</tt> that contains proxy reconstructions of SST (note there are some added points to the original MARGO dataset). 
-* <tt>sic_data</tt> that contains proxy reconstructions of SST (note there are some added points to the original MARGO dataset). 
+* <tt>model_data</tt> that contains the PMIP simulation outputs of SST and SIC,
+* <tt>sst_data</tt> that contains proxy reconstructions of SST (note the pseudo-observations mentioned in Section 4.2.1 are included here), and
+* <tt>sic_data</tt> that contains binary estimates of SIC inferred from Northern and Southern hemisphere maximum sea-ice extents. 
 
-These files are all lists that contain useful information to the analysis. The main contents of these lists are
+# Sea-surface temperature
 
-## Update sea-surface temperature
-
-
-```{r}
-as_tibble(margo_sst$data)
-```
-
-```{r, echo = FALSE}
-margo_sst$data %>%
-  ggplot() +
-    ggplot2::geom_point(aes(x = lon, y = lat, color = sst_obs), size = 0.5) + 
-	  ggplot2::geom_polygon(
-	    data = coastlines, 
-	    aes(x = long, y = lat, group = group), 
-	    fill = "white"
-	  ) + 
-	  ggplot2::geom_path(
-	    data = coastlines, 
-	    aes(x = long, y = lat, group = group), size = 0.3
-	  ) + 
-	  scico::scale_color_scico(
-	  	expression(degree~"C"), direction = -1, palette = "roma"
-	  ) +
-	  ggplot2::scale_x_continuous(expand = c(0,0)) +
-	  ggplot2::scale_y_continuous(expand = c(0,0)) +
-	  ggplot2::xlab("Longitude") + 
-	  ggplot2::ylab("Latitude") +
-	  ggplot2::coord_fixed() +
-	  ggplot2::theme_bw() +
-	  ggplot2::guides(
-	  	fill = ggplot2::guide_colourbar(barwidth = 0.5, barheight = 4)
-	  ) +
-	  ggplot2::theme(
-	  	axis.text = ggplot2::element_text(size = 10), 
-	  	axis.title = ggplot2::element_text(size = 10)
-	  )
-```
-```{r, echo = FALSE}
-margo_sst$data %>%
-  dplyr::filter(source != "xavier") %>%
-  ggplot2::ggplot() +
-	  ggplot2::geom_point(aes(x = lon, y = lat, shape = source), size = 0.8) + 
-	  ggplot2::geom_polygon(
-	    data = coastlines, 
-	    aes(x = long, y = lat, group = group), 
-	    fill = "white"
-	  ) + 
-	  ggplot2::geom_path(
-	    data = coastlines, 
-	    aes(x = long, y = lat, group = group), size = 0.3
-	  ) + 
-		ggplot2::scale_shape_discrete("Proxy Type") +
-		ggplot2::scale_x_continuous(expand = c(0,0)) +
-		ggplot2::scale_y_continuous(expand = c(0,0)) +
-		ggplot2::xlab("Longitude") + 
-		ggplot2::ylab("Latitude") +
-		ggplot2::coord_fixed() +
-		ggplot2::theme_bw() +
-		ggplot2::theme(
-			axis.text = ggplot2::element_text(size = 10), 
-			axis.title = ggplot2::element_text(size = 10)
-		)
-```
-
-```{r}
-as_tibble(pmip_sst$sst)
-```
-
-<!-- First thing is to generate the incidence matrices.
-
-```{r}
-H_list <- generate_H(pmip_sst, margo_sst)
-utils::str(H_list)
-```
-
-Then we optimise our loss to get an estimate of the variance parameters $\alpha$ and $\kappa$. (This is being loaded from memory in the background so I don't have to wait for the fitting procedure when I'm rendering the README)
-
-```{r, eval = FALSE}
-params_hat <- train_params(sst_model, meas, H_list)
-```
-
-```{r, echo = FALSE}
-params_hat <- tibble(
-	tau = 6,
-	alpha = 0.921,
-	kappa = 1.61,
-	beta = 1
-)
-```
-
-```{r}
-params_hat
-```
- -->
-## Update sea-ice concentration
+# Update sea-ice concentration
 
 
 
