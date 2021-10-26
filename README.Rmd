@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-This is the accompanying package to "Coexchangeable process modelling for uncertainty quantification in joint climate reconstruction". 
+This is the accompanying package to "Coexchangeable process modelling for uncertainty quantification in joint climate reconstruction". This <tt>.rmd</tt> file pulls some results from pre-computed results; to run the analysis from scratch look in <tt>run_analysis.R</tt>.
 
 # Installation
 
@@ -28,23 +28,28 @@ To execute on your local machine you can install <tt>exanalysis</tt> direct from
 devtools::install_github("astfalckl/exanalysis")
 ```
 
-# Code run-through
+and load <tt> exanalysis </tt>.
 
-## Update sea-surface temperature
-
-Let us first load <tt> exanalysis </tt> and some other dependencies.
-
-```{r example}
+```{r warning = FALSE}
 library(exanalysis)
+```
+
+```{r echo = FALSE}
 library(tidyverse)
 ```
 
-The package ships with a number of rds files that contain the data used in the paper. Namely, there is
+# Data
 
-* <tt> pmip_sst </tt> that contains the simulation outputs of SST,
-* <tt> margo_sst </tt> that contains proxy reconstructions of SST (note there are some added points to the original MARGO dataset). 
+The package ships with a number of <tt>.rds</tt> files that contain the data used in the paper. Namely,
+
+* <tt>model_data</tt> that contains the simulation outputs of SST,
+* <tt>sst_data</tt> that contains proxy reconstructions of SST (note there are some added points to the original MARGO dataset). 
+* <tt>sic_data</tt> that contains proxy reconstructions of SST (note there are some added points to the original MARGO dataset). 
 
 These files are all lists that contain useful information to the analysis. The main contents of these lists are
+
+## Update sea-surface temperature
+
 
 ```{r}
 as_tibble(margo_sst$data)

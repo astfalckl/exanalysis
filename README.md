@@ -8,7 +8,9 @@
 <!-- badges: end -->
 
 This is the accompanying package to “Coexchangeable process modelling
-for uncertainty quantification in joint climate reconstruction”.
+for uncertainty quantification in joint climate reconstruction”. This
+<tt>.rmd</tt> file pulls some results from pre-computed results; to run
+the analysis from scratch look in <tt>run\_analysis.R</tt>.
 
 # Installation
 
@@ -19,42 +21,44 @@ direct from GitHub:
 devtools::install_github("astfalckl/exanalysis")
 ```
 
-# Code run-through
-
-## Update sea-surface temperature
-
-Let us first load <tt> exanalysis </tt> and some other dependencies.
+and load <tt> exanalysis </tt>.
 
 ``` r
 library(exanalysis)
-library(tidyverse)
-#> Warning: package 'tidyverse' was built under R version 3.6.2
-#> ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
-#> ✔ ggplot2 3.3.5     ✔ purrr   0.3.4
-#> ✔ tibble  3.1.2     ✔ dplyr   1.0.7
-#> ✔ tidyr   1.1.3     ✔ stringr 1.4.0
-#> ✔ readr   1.4.0     ✔ forcats 0.5.1
-#> Warning: package 'ggplot2' was built under R version 3.6.2
-#> Warning: package 'tibble' was built under R version 3.6.2
-#> Warning: package 'tidyr' was built under R version 3.6.2
-#> Warning: package 'readr' was built under R version 3.6.2
-#> Warning: package 'purrr' was built under R version 3.6.2
-#> Warning: package 'dplyr' was built under R version 3.6.2
-#> Warning: package 'forcats' was built under R version 3.6.2
-#> ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-#> ✖ dplyr::filter() masks stats::filter()
-#> ✖ dplyr::lag()    masks stats::lag()
 ```
 
-The package ships with a number of rds files that contain the data used
-in the paper. Namely, there is
+    #> Warning: package 'tidyverse' was built under R version 3.6.2
+    #> ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
+    #> ✔ ggplot2 3.3.5     ✔ purrr   0.3.4
+    #> ✔ tibble  3.1.2     ✔ dplyr   1.0.7
+    #> ✔ tidyr   1.1.3     ✔ stringr 1.4.0
+    #> ✔ readr   1.4.0     ✔ forcats 0.5.1
+    #> Warning: package 'ggplot2' was built under R version 3.6.2
+    #> Warning: package 'tibble' was built under R version 3.6.2
+    #> Warning: package 'tidyr' was built under R version 3.6.2
+    #> Warning: package 'readr' was built under R version 3.6.2
+    #> Warning: package 'purrr' was built under R version 3.6.2
+    #> Warning: package 'dplyr' was built under R version 3.6.2
+    #> Warning: package 'forcats' was built under R version 3.6.2
+    #> ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+    #> ✖ dplyr::filter() masks stats::filter()
+    #> ✖ dplyr::lag()    masks stats::lag()
 
-  - <tt> pmip\_sst </tt> that contains the simulation outputs of SST,
-  - <tt> margo\_sst </tt> that contains proxy reconstructions of SST
-    (note there are some added points to the original MARGO dataset).
+# Data
+
+The package ships with a number of <tt>.rds</tt> files that contain the
+data used in the paper. Namely,
+
+  - <tt>model\_data</tt> that contains the simulation outputs of SST,
+  - <tt>sst\_data</tt> that contains proxy reconstructions of SST (note
+    there are some added points to the original MARGO dataset).
+  - <tt>sic\_data</tt> that contains proxy reconstructions of SST (note
+    there are some added points to the original MARGO dataset).
 
 These files are all lists that contain useful information to the
 analysis. The main contents of these lists are
+
+## Update sea-surface temperature
 
 ``` r
 as_tibble(margo_sst$data)
@@ -76,8 +80,8 @@ as_tibble(margo_sst$data)
 
     #> Loading required package: sp
 
-<img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
-<img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
 
 ``` r
 as_tibble(pmip_sst$sst)
