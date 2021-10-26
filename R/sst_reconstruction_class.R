@@ -44,16 +44,29 @@ calculate_svds <- function(obj, ...) {
   UseMethod("calculate_svds")
 }
 
+#' Calculates the top n SVDs from an sst_reconstruction object
+#'
+#' @param obj an sst_reconstruction object
+#' @param n the number of SVDs
+#'
+#' @return a list comprising of a tibble with the sampled field and the SVD 
+#' indexes
+#' @export
 calculate_svds.sst_reconstruction <- function(obj, n = 20){
+
+	sst <- lat <- lon <- NULL
 	
 	svds <- irlba::irlba(obj$Vs, nv = n, right_only = TRUE)
 
-	svd_scaled <- svds$v %*% diag(sqrt(svds$d))
-	colnames(svd_scaled) <- paste0("SVD", str_pad(1:n, 2,"left", "0"))
+	svd_scaled <- svds$v %*% base::diag(base::sqrt(svds$d))
+	base::colnames(svd_scaled) <- base::paste0(
+		"SVD", 
+		stringr::str_pad(1:n, 2,"left", "0")
+	)
 
 	svd_long <- obj$simulation$coords %>%
-	  bind_cols(as_tibble(svd_scaled)) %>%
-	  gather(svd, sst, -lat, -lon)
+	  dplyr::bind_cols(dplyr::as_tibble(svd_scaled)) %>%
+	  tidyr::gather(svd, sst, -lat, -lon)
 
 	obj$pre_mat <- svd_scaled
 	obj$svds <- svd_long

@@ -27,6 +27,9 @@ wendland <- function(D, tau, alpha, kappa, delta = NULL){
 #' @return A plot of the spline bases
 #' @export
 plot_spline_basis <- function(spline_object){
+  
+  spline <- value <- NULL
+
   x <- attr(spline_object, "x")
   
   spline_object %>% 
@@ -34,7 +37,7 @@ plot_spline_basis <- function(spline_object){
     dplyr::mutate(x = x) %>%
     tidyr::gather(spline, value, -x) %>%
     ggplot2::ggplot() + 
-      ggplot2::geom_line(aes(x = x, y = value, colour = spline)) +
+      ggplot2::geom_line(ggplot2::aes(x = x, y = value, colour = spline)) +
       ggplot2::theme_bw()
     
 } 
@@ -80,7 +83,7 @@ fit_spline <- function(sst, ice, spline_params){
   X <- calc_X(sst, spline_params)
 
   beta <- exp(
-    optim(
+    stats::optim(
       log(spline_params$prior_exp+0.001), 
       loss, 
       gr = NULL, 
@@ -88,7 +91,7 @@ fit_spline <- function(sst, ice, spline_params){
     )$par
   )
   
-  return(tibble(beta = beta, idx = 1:5))
+  return(dplyr::tibble(beta = beta, idx = 1:5))
 
 }
 

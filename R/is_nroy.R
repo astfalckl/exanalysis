@@ -13,7 +13,9 @@
 #' @export
 is_nroy <- function(sampled_ice, wsi_area_south, wsi_area_north, coords_area){
 
-  south_ice_area <- sampled$sampled_fields %>%
+  time <- lat <- ice <- area <- area_ice <- NULL
+
+  south_ice_area <- sampled_ice$sampled_fields %>%
     dplyr::filter(time == 8) %>%
     dplyr::filter(lat <= 0) %>%
     dplyr::left_join(coords_area, by = c("lon", "lat")) %>%
@@ -21,7 +23,7 @@ is_nroy <- function(sampled_ice, wsi_area_south, wsi_area_north, coords_area){
     dplyr::pull(area_ice) %>%
     base::sum()
 
-  north_ice_area <- sampled$sampled_fields %>%
+  north_ice_area <- sampled_ice$sampled_fields %>%
     dplyr::filter(time == 2) %>%
     dplyr::filter(lat >= 0) %>%
     dplyr::left_join(coords_area, by = c("lon", "lat")) %>%

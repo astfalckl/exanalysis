@@ -5,15 +5,12 @@
 \alias{margo_sst}
 \title{SST Proxy Data}
 \format{
-A sst_sim object of PMIP outputs
-}
-\source{
-Go through and ref every object in here
+A sst_data object of PMIP outputs
 }
 \usage{
 margo_sst
 }
 \description{
-A collection of proxy based SST measurements
+A collection of proxy based SST measurements from the MARGO project.
 }
 \keyword{datasets}

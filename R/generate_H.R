@@ -9,6 +9,8 @@
 #' @export
 generate_H <- function(simulation, proxy){
 
+  type <- NULL
+
   # Calculate Hs
 
   cat(sprintf("\rCalculating Hs..."))

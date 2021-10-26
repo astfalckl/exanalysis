@@ -1,19 +1,22 @@
 
 #' Calculates BL update of the SIC parameters
 #'
-#' @param all_ice_fits
-#' @param spline_params
+#' @param all_ice_fits sic coefficient projections from project_sic_coefs()
+#' @param spline_params chosen spline parameters. This is a list with elements
+#' bounds, knots, degree, and prior_exp
 #'
-#' @return 
+#' @return list with sic updates for each parameter
 #' @export
 update_sic <- function(
   all_ice_fits,
   spline_params
 ){
 
+  lon <- lat <- idx <- NULL
+
   ave_ice_fits <- all_ice_fits %>%
-    group_by(lon, lat, idx) %>%
-    summarise(beta = mean(beta), .groups = "drop")
+    dplyr::group_by(lon, lat, idx) %>%
+    dplyr::summarise(beta = mean(beta), .groups = "drop")
 
   ice_updates <- vector(mode = "list", length = 5)
   names(ice_updates) <- paste0("beta", 1:5)
@@ -23,31 +26,31 @@ update_sic <- function(
     cat(sprintf("\rBeta %i", i))
 
     ave_ice_fits <- all_ice_fits %>%
-      filter(idx == i) %>%
-      group_by(lon, lat) %>%
-      summarise(beta = mean(beta), .groups = "drop")
+      dplyr::filter(idx == i) %>%
+      dplyr::group_by(lon, lat) %>%
+      dplyr::summarise(beta = mean(beta), .groups = "drop")
 
     coords <- ave_ice_fits %>%
       dplyr::select(lon, lat) %>%
       unique()
 
-    D <- rdist.earth(as.matrix(coords), R = 1) 
+    D <- fields::rdist.earth(as.matrix(coords), R = 1) 
 
     C <- D %>% 
       wendland(6, 3, 1, 1e-06) %>%
-      Matrix()
+      Matrix::Matrix()
 
     var_ice_fits <- all_ice_fits %>%
-      group_by(lon, lat, idx) %>%
-      summarise(var_beta = var(beta), .groups = "drop") %>%
-      filter(idx == i)
+      dplyr::group_by(lon, lat, idx) %>%
+      dplyr::summarise(var_beta = stats::var(beta), .groups = "drop") %>%
+      dplyr::filter(idx == i)
 
-    K <- Matrix(diag(sqrt(var_ice_fits$var_beta)))
+    K <- Matrix::Matrix(diag(sqrt(var_ice_fits$var_beta)))
 
     V_ice <- K %*% C %*% K
 
-    Mu_ice <- ave_ice_fits %>% pull(beta) %>% Matrix()
-    Mu_prior <- Matrix(rep(spline_params$prior_exp[i], nrow(coords)))
+    Mu_ice <- ave_ice_fits %>% dplyr::pull(beta) %>% Matrix::Matrix()
+    Mu_prior <- Matrix::Matrix(rep(spline_params$prior_exp[i], nrow(coords)))
 
     model_names <- unique(all_ice_fits$model)
     m <- length(model_names)
@@ -55,7 +58,8 @@ update_sic <- function(
     n <- nrow(coords)
 
     inv_bit <- solve(
-      alpha * V_ice + (1-alpha)/(2*m) * V_ice + 1/m * Diagonal(n, rep(0.001, n))
+      alpha * V_ice + (1-alpha)/(2*m) * V_ice + 
+        1/m * Matrix::Diagonal(n, rep(0.001, n))
     )
 
     E_adj <- Mu_prior + alpha * V_ice %*% inv_bit %*% (Mu_ice - Mu_prior)

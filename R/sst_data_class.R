@@ -3,7 +3,10 @@
 #' 
 #' This creates the object that holds the sst_data results, i.e., the Z
 #'
-#' @param object list with elements XYZ
+#' @param data a tibble of sst data
+#' @param coords the coordinates of the data
+#' @param B a matrix of expected bias (if included)
+#' @param varB a matrix of bias variance (if included)
 #'
 #' @return Returns a sst_data object
 #' @export
@@ -15,7 +18,7 @@ create_sst_data_object <- function(
 
   if(is.null(B)) {B <- matrix(0, nrow = n)}
 
-  if(is.null(varB)) {varB <- Matrix(matrix(0, nrow = n, ncol = n))}
+  if(is.null(varB)) {varB <- Matrix::Matrix(matrix(0, nrow = n, ncol = n))}
 
   object <- list(data = data, coords = coords, B = B, varB = varB, n = n)
 
