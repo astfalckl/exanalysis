@@ -29,7 +29,7 @@ and load <tt> exanalysis </tt>.
 library(exanalysis)
 ```
 
-```{r warning = FALSE, echo = FALSE}
+```{r warning = FALSE, echo = FALSE, message = FALSE}
 library(tidyverse)
 ```
 
