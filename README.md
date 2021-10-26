@@ -21,25 +21,18 @@ direct from GitHub:
 devtools::install_github("astfalckl/exanalysis")
 ```
 
-and load <tt> exanalysis </tt>.
+and load <tt> exanalysis
+    </tt>.
 
 ``` r
 library(exanalysis)
 ```
 
-    #> Warning: package 'tidyverse' was built under R version 3.6.2
     #> ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
     #> ✔ ggplot2 3.3.5     ✔ purrr   0.3.4
     #> ✔ tibble  3.1.2     ✔ dplyr   1.0.7
     #> ✔ tidyr   1.1.3     ✔ stringr 1.4.0
     #> ✔ readr   1.4.0     ✔ forcats 0.5.1
-    #> Warning: package 'ggplot2' was built under R version 3.6.2
-    #> Warning: package 'tibble' was built under R version 3.6.2
-    #> Warning: package 'tidyr' was built under R version 3.6.2
-    #> Warning: package 'readr' was built under R version 3.6.2
-    #> Warning: package 'purrr' was built under R version 3.6.2
-    #> Warning: package 'dplyr' was built under R version 3.6.2
-    #> Warning: package 'forcats' was built under R version 3.6.2
     #> ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
     #> ✖ dplyr::filter() masks stats::filter()
     #> ✖ dplyr::lag()    masks stats::lag()

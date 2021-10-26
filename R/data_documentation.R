@@ -1,3 +1,10 @@
+#' Monthly averages of SST and SIC from PMIP
+#' 
+#' A collection of SST and SIC Simulations from PMIP 3 and 4.
+#' 
+#' @format A sst_sim object of PMIP outputs
+"model_data"
+
 #' PMIP SST Simulations
 #' 
 #' A collection of SST Simulations from PMIP 3 and 4. This list is not 
