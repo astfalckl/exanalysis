@@ -1,30 +1,27 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-\#\#NOTE: This code is still very much in development. If you have
-somehow stumbled onto my GitHub to have a squizz, thanks for the
-interest but please advert your eyes for a moment.
-
-# exanalysis
+# Coexchangeable process modelling for uncertainty quantification in joint climate reconstruction
 
 <!-- badges: start -->
 
 <!-- badges: end -->
 
-This is the accompanying package to “Reconstruction of sea-surface
-temperature and sea-ice concentration via exchangeability analysis”.
+This is the accompanying package to “Coexchangeable process modelling
+for uncertainty quantification in joint climate reconstruction”.
 
-## Installation
+# Installation
 
-You can install <tt> exanalysis </tt> direct from GitHub:
+To execute on your local machine you can install <tt>exanalysis</tt>
+direct from GitHub:
 
 ``` r
 devtools::install_github("astfalckl/exanalysis")
 ```
 
-## Code run-through
+# Code run-through
 
-# Update sea-surface temperature
+## Update sea-surface temperature
 
 Let us first load <tt> exanalysis </tt> and some other dependencies.
 
@@ -33,10 +30,10 @@ library(exanalysis)
 library(tidyverse)
 #> Warning: package 'tidyverse' was built under R version 3.6.2
 #> ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.1 ──
-#> ✓ ggplot2 3.3.5     ✓ purrr   0.3.4
-#> ✓ tibble  3.1.2     ✓ dplyr   1.0.7
-#> ✓ tidyr   1.1.3     ✓ stringr 1.4.0
-#> ✓ readr   1.4.0     ✓ forcats 0.5.1
+#> ✔ ggplot2 3.3.5     ✔ purrr   0.3.4
+#> ✔ tibble  3.1.2     ✔ dplyr   1.0.7
+#> ✔ tidyr   1.1.3     ✔ stringr 1.4.0
+#> ✔ readr   1.4.0     ✔ forcats 0.5.1
 #> Warning: package 'ggplot2' was built under R version 3.6.2
 #> Warning: package 'tibble' was built under R version 3.6.2
 #> Warning: package 'tidyr' was built under R version 3.6.2
@@ -45,8 +42,8 @@ library(tidyverse)
 #> Warning: package 'dplyr' was built under R version 3.6.2
 #> Warning: package 'forcats' was built under R version 3.6.2
 #> ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-#> x dplyr::filter() masks stats::filter()
-#> x dplyr::lag()    masks stats::lag()
+#> ✖ dplyr::filter() masks stats::filter()
+#> ✖ dplyr::lag()    masks stats::lag()
 ```
 
 The package ships with a number of rds files that contain the data used
@@ -77,67 +74,9 @@ as_tibble(margo_sst$data)
 #> # … with 756 more rows
 ```
 
-``` r
-margo_sst$data %>%
-  ggplot() +
-    ggplot2::geom_point(aes(x = lon, y = lat, color = sst_obs), size = 0.5) + 
-      ggplot2::geom_polygon(
-        data = coastlines, 
-        aes(x = long, y = lat, group = group), 
-        fill = "white"
-      ) + 
-      ggplot2::geom_path(
-        data = coastlines, 
-        aes(x = long, y = lat, group = group), size = 0.3
-      ) + 
-      scico::scale_color_scico(
-        expression(degree~"C"), direction = -1, palette = "roma"
-      ) +
-      ggplot2::scale_x_continuous(expand = c(0,0)) +
-      ggplot2::scale_y_continuous(expand = c(0,0)) +
-      ggplot2::xlab("Longitude") + 
-      ggplot2::ylab("Latitude") +
-      ggplot2::coord_fixed() +
-      ggplot2::theme_bw() +
-      ggplot2::guides(
-        fill = ggplot2::guide_colourbar(barwidth = 0.5, barheight = 4)
-      ) +
-      ggplot2::theme(
-        axis.text = ggplot2::element_text(size = 10), 
-        axis.title = ggplot2::element_text(size = 10)
-      )
-#> Loading required package: sp
-```
+    #> Loading required package: sp
 
 <img src="man/figures/README-unnamed-chunk-3-1.png" width="100%" />
-
-``` r
-margo_sst$data %>%
-  dplyr::filter(source != "xavier") %>%
-  ggplot2::ggplot() +
-      ggplot2::geom_point(aes(x = lon, y = lat, shape = source), size = 0.8) + 
-      ggplot2::geom_polygon(
-        data = coastlines, 
-        aes(x = long, y = lat, group = group), 
-        fill = "white"
-      ) + 
-      ggplot2::geom_path(
-        data = coastlines, 
-        aes(x = long, y = lat, group = group), size = 0.3
-      ) + 
-        ggplot2::scale_shape_discrete("Proxy Type") +
-        ggplot2::scale_x_continuous(expand = c(0,0)) +
-        ggplot2::scale_y_continuous(expand = c(0,0)) +
-        ggplot2::xlab("Longitude") + 
-        ggplot2::ylab("Latitude") +
-        ggplot2::coord_fixed() +
-        ggplot2::theme_bw() +
-        ggplot2::theme(
-            axis.text = ggplot2::element_text(size = 10), 
-            axis.title = ggplot2::element_text(size = 10)
-        )
-```
-
 <img src="man/figures/README-unnamed-chunk-4-1.png" width="100%" />
 
 ``` r
@@ -214,4 +153,4 @@ params_hat
 ```
  -->
 
-# Update sea-ice concentration
+## Update sea-ice concentration

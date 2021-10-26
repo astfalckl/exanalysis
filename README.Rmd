@@ -13,18 +13,16 @@ knitr::opts_chunk$set(
 )
 ```
 
-##NOTE: This code is still very much in development. If you have somehow stumbled onto my GitHub to have a squizz, thanks for the interest but please advert your eyes for a moment.
-
-# exanalysis
+# Coexchangeable process modelling for uncertainty quantification in joint climate reconstruction
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-This is the accompanying package to "Reconstruction of sea-surface temperature and sea-ice concentration via exchangeability analysis".
+This is the accompanying package to "Coexchangeable process modelling for uncertainty quantification in joint climate reconstruction". 
 
 # Installation
 
-You can install <tt> exanalysis </tt> direct from GitHub:
+To execute on your local machine you can install <tt>exanalysis</tt> direct from GitHub:
 
 ``` r
 devtools::install_github("astfalckl/exanalysis")
