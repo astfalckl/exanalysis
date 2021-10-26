@@ -41,10 +41,12 @@ The package ships with a number of <tt>.rds</tt> files that contain the data use
 * <tt>sst_data</tt> that contains proxy reconstructions of SST (note the pseudo-observations mentioned in Section 4.2.1 are included here), and
 * <tt>sic_data</tt> that contains binary estimates of SIC inferred from Northern and Southern hemisphere maximum sea-ice extents. 
 
+![SST Data](images/sst_data_plot.png)
+
 # Sea-surface temperature
 
 To calculate the SST belief updates detailed in Section 4.2.1. we use two functions.
-The first, <tt>generate_Hx()</tt>, calculates $H_x$ and the second, <tt>calculate_sst_update()</tt>, calculates the belief updates.
+The first, <tt>generate_Hx()</tt>, calculates $H_x$ and the second, <tt>calculate_sst_update()</tt>, calculates the belief updates. Our prior belief specifications are stored as a tibble in <tt>params_prior</tt>.
 
 ```{r, eval = FALSE}
 H_list <- generate_Hx(pmip_sst, margo_pseudo)
@@ -61,7 +63,19 @@ sst_update <- calculate_sst_update(pmip_sst, margo_pseudo, H_list, params_prior)
 
 # Update sea-ice concentration
 
+Calculating SIC belief updates require a bit more involvement than the SST updates. First, we set the spline basis functions in the <tt>spline_params</tt> objects. The $\hat{\beta}_i$ are calculated from <tt>project_betais</tt>.
 
+```{r, eval = FALSE}
+spline_params <- list(
+  bounds = c(-1.92, 10),
+  knots = c(-1, -0.5, 1.229281),
+  degree = 1,
+  prior_exp = c(0.40, .40, 0.2, 0, 0)
+)
+
+betais <- project_betais(sst_update, spline_params)
+
+```
 
 
 

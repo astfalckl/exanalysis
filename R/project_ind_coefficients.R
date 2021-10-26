@@ -16,9 +16,9 @@ project_sic_coefs <- function(
 
   base::cat(base::sprintf("\r Setting up data"))
 
-  model_names <- sst_update$simulation$sst$model %>% base::unique()
+  model_names <- sst_update$simulation$data$model %>% base::unique()
 
-  model_bounds <- sst_update$simulation$sst %>%
+  model_bounds <- sst_update$simulation$data %>%
     dplyr::group_by(model) %>%
     dplyr::summarise(
       min = base::min(sst),
@@ -29,7 +29,7 @@ project_sic_coefs <- function(
       scale = (max - spline_params$bounds[1])/diff
     )
 
-  data_scaled <- sst_update$simulation$sst %>%
+  data_scaled <- sst_update$simulation$data %>%
     dplyr::left_join(model_bounds, by = "model") %>%
     dplyr::rowwise() %>%
     dplyr::mutate(sst = (sst - min) * scale + spline_params$bounds[1]) %>%

@@ -18,7 +18,7 @@ calculate_sst_update <- function(simulation, proxy, H_list, params, incl_varM = 
 	cat(sprintf("\rSetting up bits...         "))
 
 	varS <- fields::rdist.earth(as.matrix(simulation$coords), R = 1) %>% 
-	  wendland(params$tau, params$alpha, params$kappa, 1e-06) %>%
+	  wendland(params$tau, params$c, params$kappa, 1e-06) %>%
 	  Matrix::Matrix()
 
 	varT <- Matrix::Matrix(1, nrow = simulation$ntime, ncol = simulation$ntime)
@@ -26,7 +26,7 @@ calculate_sst_update <- function(simulation, proxy, H_list, params, incl_varM = 
 	M <- Matrix::Matrix(simulation$means$sst)
 	D <- Matrix::Diagonal(proxy$n, proxy$data$sd^2)
 
-	M_scale <- params$beta/(simulation$m + params$beta)
+	M_scale <- params$alpha2/(simulation$m + params$alpha2)
 
 	varYS <- varS # + M_scale * varM
 
