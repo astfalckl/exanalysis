@@ -15,7 +15,7 @@ direct from GitHub:
 devtools::install_github("astfalckl/exanalysis")
 ```
 
-and load <tt> exanalysis </tt>.
+and load:
 
 ``` r
 library(exanalysis)
@@ -35,5 +35,23 @@ data used in the paper. Namely,
     from Northern and Southern hemisphere maximum sea-ice extents.
 
 # Sea-surface temperature
+
+To calculate the SST belief updates detailed in Section 4.2.1. we use
+two functions. The first, <tt>generate\_Hx()</tt>, calculates \(H_x\)
+and the second, <tt>calculate\_sst\_update()</tt>, calculates the belief
+updates.
+
+``` r
+H_list <- generate_Hx(pmip_sst, margo_pseudo)
+
+params_prior <- tibble(
+  tau = 6,
+  alpha = 0.921,
+  kappa = 1.61,
+  beta = 1
+)
+
+sst_update <- calculate_sst_update(pmip_sst, margo_pseudo, H_list, params_prior)
+```
 
 # Update sea-ice concentration

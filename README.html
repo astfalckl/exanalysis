@@ -605,7 +605,7 @@ body {
 <h1 id="installation">Installation</h1>
 <p>To execute on your local machine you can install <tt>exanalysis</tt> direct from GitHub:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1">devtools<span class="op">::</span><span class="kw">install_github</span>(<span class="st">&quot;astfalckl/exanalysis&quot;</span>)</a></code></pre></div>
-<p>and load <tt> exanalysis </tt>.</p>
+<p>and load:</p>
 <div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="kw">library</span>(exanalysis)</a></code></pre></div>
 <h1 id="data">Data</h1>
 <p>The package ships with a number of <tt>.rds</tt> files that contain the data used in the paper. Namely,</p>
@@ -615,6 +615,17 @@ body {
 <li><tt>sic_data</tt> that contains binary estimates of SIC inferred from Northern and Southern hemisphere maximum sea-ice extents.</li>
 </ul>
 <h1 id="sea-surface-temperature">Sea-surface temperature</h1>
+<p>To calculate the SST belief updates detailed in Section 4.2.1. we use two functions. The first, <tt>generate_Hx()</tt>, calculates (H_x) and the second, <tt>calculate_sst_update()</tt>, calculates the belief updates.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">H_list &lt;-<span class="st"> </span><span class="kw">generate_Hx</span>(pmip_sst, margo_pseudo)</a>
+<a class="sourceLine" id="cb3-2" data-line-number="2"></a>
+<a class="sourceLine" id="cb3-3" data-line-number="3">params_prior &lt;-<span class="st"> </span><span class="kw">tibble</span>(</a>
+<a class="sourceLine" id="cb3-4" data-line-number="4">  <span class="dt">tau =</span> <span class="dv">6</span>,</a>
+<a class="sourceLine" id="cb3-5" data-line-number="5">  <span class="dt">alpha =</span> <span class="fl">0.921</span>,</a>
+<a class="sourceLine" id="cb3-6" data-line-number="6">  <span class="dt">kappa =</span> <span class="fl">1.61</span>,</a>
+<a class="sourceLine" id="cb3-7" data-line-number="7">  <span class="dt">beta =</span> <span class="dv">1</span></a>
+<a class="sourceLine" id="cb3-8" data-line-number="8">)</a>
+<a class="sourceLine" id="cb3-9" data-line-number="9"></a>
+<a class="sourceLine" id="cb3-10" data-line-number="10">sst_update &lt;-<span class="st"> </span><span class="kw">calculate_sst_update</span>(pmip_sst, margo_pseudo, H_list, params_prior)</a></code></pre></div>
 <h1 id="update-sea-ice-concentration">Update sea-ice concentration</h1>
 
 </body>

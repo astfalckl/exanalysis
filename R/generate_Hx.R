@@ -7,7 +7,7 @@
 #' @return Returns a list of Hs, Hs_collapse (reshuffled Hs to make some 
 #' calculation easier), Ht and H.
 #' @export
-generate_H <- function(simulation, proxy){
+generate_Hx <- function(simulation, proxy){
 
   type <- NULL
 
