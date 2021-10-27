@@ -628,7 +628,7 @@ body {
 <a class="sourceLine" id="cb3-8" data-line-number="8">)</a>
 <a class="sourceLine" id="cb3-9" data-line-number="9"></a>
 <a class="sourceLine" id="cb3-10" data-line-number="10">sst_update &lt;-<span class="st"> </span><span class="kw">calculate_sst_update</span>(</a>
-<a class="sourceLine" id="cb3-11" data-line-number="11">  model_data, sst_data, H_list, sst_prior_params</a>
+<a class="sourceLine" id="cb3-11" data-line-number="11">  model_data, sst_data, H_list, sst_prior_params, <span class="ot">TRUE</span></a>
 <a class="sourceLine" id="cb3-12" data-line-number="12">)</a></code></pre></div>
 <h1 id="update-sea-ice-concentration">Update sea-ice concentration</h1>
 <p>Calculating SIC belief updates require a bit more involvement than the SST updates. First, we set the spline basis functions in the <tt>spline_params</tt> objects. The (\hat{\beta}_i) are calculated from <tt>project_betais</tt>.</p>

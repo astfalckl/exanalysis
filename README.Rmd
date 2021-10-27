@@ -59,7 +59,7 @@ sst_prior_params <- tibble(
 )
 
 sst_update <- calculate_sst_update(
-  model_data, sst_data, H_list, sst_prior_params
+  model_data, sst_data, H_list, sst_prior_params, TRUE
 )
 ```
 
