@@ -616,14 +616,13 @@ body {
 </ul>
 <!-- ![SST Data](images/sst_data_plot.png) -->
 
-<p>/</p>
 <h1 id="sea-surface-temperature">Sea-surface temperature</h1>
 <p>To calculate the SST belief updates detailed in Section 4.2.1. we use two functions. The first, <tt>generate_Hx()</tt>, calculates (H_x) and the second, <tt>calculate_sst_update()</tt>, calculates the belief updates. Our prior belief specifications are stored as a tibble in <tt>params_prior</tt>.</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">H_list &lt;-<span class="st"> </span><span class="kw">generate_Hx</span>(model_data, sst_data)</a>
 <a class="sourceLine" id="cb3-2" data-line-number="2"></a>
 <a class="sourceLine" id="cb3-3" data-line-number="3">sst_prior_params &lt;-<span class="st"> </span><span class="kw">tibble</span>(</a>
-<a class="sourceLine" id="cb3-4" data-line-number="4">  <span class="dt">tau =</span> <span class="dv">6</span>,</a>
-<a class="sourceLine" id="cb3-5" data-line-number="5">  <span class="dt">c =</span> <span class="fl">0.921</span>,</a>
+<a class="sourceLine" id="cb3-4" data-line-number="4">  <span class="dt">tau =</span> <span class="fl">8.3</span>,</a>
+<a class="sourceLine" id="cb3-5" data-line-number="5">  <span class="dt">c =</span> <span class="fl">1.52</span>,</a>
 <a class="sourceLine" id="cb3-6" data-line-number="6">  <span class="dt">kappa =</span> <span class="fl">1.61</span>,</a>
 <a class="sourceLine" id="cb3-7" data-line-number="7">  <span class="dt">alpha2 =</span> <span class="dv">1</span></a>
 <a class="sourceLine" id="cb3-8" data-line-number="8">)</a>

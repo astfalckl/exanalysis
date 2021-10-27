@@ -36,8 +36,6 @@ data used in the paper. Namely,
 
 <!-- ![SST Data](images/sst_data_plot.png) -->
 
-/
-
 # Sea-surface temperature
 
 To calculate the SST belief updates detailed in Section 4.2.1. we use
@@ -50,8 +48,8 @@ updates. Our prior belief specifications are stored as a tibble in
 H_list <- generate_Hx(model_data, sst_data)
 
 sst_prior_params <- tibble(
-  tau = 6,
-  c = 0.921,
+  tau = 8.3,
+  c = 1.52,
   kappa = 1.61,
   alpha2 = 1
 )

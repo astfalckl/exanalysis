@@ -13,7 +13,7 @@
 #'
 #' @return Returns loss
 #' @export
-calculate_sst_update <- function(simulation, proxy, H_list, params, incl_varM = NULL){
+calculate_sst_update <- function(simulation, proxy, H_list, params, incl_varM = FALSE){
 
 	cat(sprintf("\rSetting up bits...         "))
 
@@ -28,7 +28,12 @@ calculate_sst_update <- function(simulation, proxy, H_list, params, incl_varM = 
 
 	M_scale <- params$alpha2/(simulation$m + params$alpha2)
 
-	varYS <- varS # + M_scale * varM
+	ns <- simulation$n	
+	varMs <- matrix(0, nrow = ns, ncol = ns)
+
+	if(incl_varM){varMs <- calculate_Ms(simulation)}
+
+	varYS <- varS + M_scale * varM
 
 	one <- matrix(1/simulation$ntime, nrow = simulation$ntime, ncol = 1)
 
