@@ -7,71 +7,119 @@
 #'
 #' @return list with sic updates for each parameter
 #' @export
-update_sic <- function(
-  all_ice_fits,
-  spline_params
+calculate_sic_update <- function(
+  sst_update, spline_params, sic_prior_params, betais, Xstar, sic_data
 ){
 
-  lon <- lat <- idx <- NULL
+  m <- sst_update$simulation$m
+  coords <- sst_update$simulation$coords
+  ns <- sst_update$simulation$n
+  nl <- length(spline_params$prior_exp)
 
-  ave_ice_fits <- all_ice_fits %>%
-    dplyr::group_by(lon, lat, idx) %>%
-    dplyr::summarise(beta = mean(beta), .groups = "drop")
+  # ###################################
+  # VARIANCE MATRICES NEED TO BE FIGURED OUT
+  var_beta_tbd <- diag(diag(cov(t(as.matrix(do.call(cbind, betais$betais))))))
+  var_Rhat <- 0.05 * var_beta_tbd
+  var_Rbeta <- 0.5 * var_beta_tbd
+  var_Mbeta <- 0.5 * var_beta_tbd
+  # ###################################
 
-  ice_updates <- vector(mode = "list", length = 5)
-  names(ice_updates) <- paste0("beta", 1:5)
+  R_list <- rep(list(var_Rbeta), m)
+  R_list[[m+1]] <- matrix(0, ncol = nl*m, nrow = nl*m)
 
-  for (i in 1:5){
+  varM <- do.call(
+    rbind,
+    do.call(cbind, rep(list(var_Mbeta), m+1)) %>%
+      list() %>% rep(m+1)
+  )
+  varB <- varM + bdiag(R_list)
+  varR <- bdiag(bdiag(rep(list(var_Rhat), m)), bdiag(rep(list(var_Rbeta), m)))
 
-    cat(sprintf("\rBeta %i", i))
+  Bhat <- rbind(do.call(rbind, betais$betais), matrix(rep(0, nl * m^2)))
+  
+  Xhat <- rbind(
+    cbind(diag(rep(1, nl * m^2)), matrix(0, nrow = nl*m^2, ncol = nl*m)),
+    cbind(-diag(rep(1, nl * m^2)), kronecker(matrix(rep(1, m)), diag(rep(1, nl*m))))
+  )
 
-    ave_ice_fits <- all_ice_fits %>%
-      dplyr::filter(idx == i) %>%
-      dplyr::group_by(lon, lat) %>%
-      dplyr::summarise(beta = mean(beta), .groups = "drop")
+  Psi_star <- sst_update$simulation$data %>%
+    filter(model == model_names[1]) %>%
+    arrange(time, lon, lat) %>%
+    dplyr::select(-sst, -model) %>%
+    left_join(
+      bind_cols(
+        sst_update$simulation$means, 
+        tibble(Xstar = Xstar)
+      )
+    ) %>%
+    mutate(sst = ifelse(sst < -1.92, -1.92, sst)) %>%
+    create_psii(spline_params)
 
-    coords <- ave_ice_fits %>%
-      dplyr::select(lon, lat) %>%
-      unique()
+  # Updates
+  V1inv <- solve(Xhat %*% varB %*% t(Xhat) + varR)
+  
+  adj_exp_B <- varB %*% t(Xhat) %*% V1inv %*% Bhat
+  adj_var_B <- varB - varB %*% t(Xhat) %*% V1inv %*% Xhat %*% varB
 
-    D <- fields::rdist.earth(as.matrix(coords), R = 1) 
+  adj_exp_Mbeta <- tail(as.numeric(adjB), nl*m)
+  adj_var_Mbeta <- adj_var_B[(nl*m*m+1):(nl*m*(m+1)), (nl*m*m+1):(nl*m*(m+1))]
 
-    C <- D %>% 
-      wendland(6, 3, 1, 1e-06) %>%
-      Matrix::Matrix()
+  Mx <- Psi_star %*% (Theta %*% adj_exp_Mbeta + betais$beta_mean)
 
-    var_ice_fits <- all_ice_fits %>%
-      dplyr::group_by(lon, lat, idx) %>%
-      dplyr::summarise(var_beta = stats::var(beta), .groups = "drop") %>%
-      dplyr::filter(idx == i)
+  ptmp <- sic_prior_params$corW_params
 
-    K <- Matrix::Matrix(diag(sqrt(var_ice_fits$var_beta)))
+  corW <- coords %>%
+    dplyr::select(lon, lat) %>%
+    arrange(lon, lat) %>%
+    as.matrix() %>%
+    fields::rdist.earth(R = 1) %>% 
+    wendland(ptmp[1], ptmp[2], ptmp[3], ptmp[4]) %>%
+    Matrix::Matrix()
 
-    V_ice <- K %*% C %*% K
+  Hy <- generate_Hy(coords, ns)
 
-    Mu_ice <- ave_ice_fits %>% dplyr::pull(beta) %>% Matrix::Matrix()
-    Mu_prior <- Matrix::Matrix(rep(spline_params$prior_exp[i], nrow(coords)))
+  ptmp <- sic_prior_params$varU_params
 
-    model_names <- unique(all_ice_fits$model)
-    m <- length(model_names)
-    alpha <- 0.8
-    n <- nrow(coords)
+  varUi <- coords %>%
+    arrange(lon, lat) %>%
+    as.matrix() %>%
+    fields::rdist.earth(R = 1) %>% 
+    wendland(ptmp[1], ptmp[2], ptmp[3], ptmp[4]) %>%
+    Matrix::Matrix()
 
-    inv_bit <- solve(
-      alpha * V_ice + (1-alpha)/(2*m) * V_ice + 
-        1/m * Matrix::Diagonal(n, rep(0.001, n))
+  varU <- bdiag(varUi, varUi, varUi, varUi, varUi)
+
+  # sic_data <- sic_data %>%
+  #   mutate(sd = ifelse(sd == 0.5, 1, sd))
+
+  varW <- Matrix(diag(sic_data$sd)) %*% corW %*% Matrix(diag(sic_data$sd))
+  varDisc <- Psi_reality %*% varU %*% t(Psi_reality)
+  V2_inv <- solve(Hy %*% varDisc %*% t(Hy) + varW + diag(rep(1e-8, nrow(varW))))
+
+  E_ice_update <- Mx + varDisc %*% t(Hy) %*% V2_inv %*% 
+    (Matrix(sic_data$ice_meas) - (Hy %*% Mx))
+
+  tmp1 <- varU %*% t(Psi_reality) %*% t(Hy)
+  tmp2 <- tmp1 %*% V2_inv %*% t(tmp1)
+  tmp3 <- varU - tmp2
+
+  V_ice_update <- Psi_reality %*% tmp3 %*% t(Psi_reality)
+  # V_ice_update <- varDisc - varDisc %*% t(Hy) %*% V2_inv %*% Hy %*% varDisc
+
+  update_tbl <- sst_update$simulation$means %>%
+    arrange(time, lon, lat) %>%
+    mutate(
+      E = as.numeric(E_ice_update),
+      E = ifelse(E > 1, 1, E),
+      E = ifelse(E < 0, 0, E),
+      V = diag(V_ice_update)
     )
 
-    E_adj <- Mu_prior + alpha * V_ice %*% inv_bit %*% (Mu_ice - Mu_prior)
-    V_adj <- alpha * V_ice - alpha^2 * V_ice %*% inv_bit %*% V_ice
-
-    E_adj[which(as.numeric(E_adj) < 0)] <- 0
-
-    ice_updates[[i]]$E_adj <- E_adj
-    ice_updates[[i]]$V_adj <- V_adj
-
-  }
-
-  return(ice_updates)
+  list(
+    data = sic_data,
+    E = E_ice_update,
+    V = V_ice_update,
+    update_tbl = update_tbl
+  )
 
 }

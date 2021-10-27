@@ -45,6 +45,13 @@ project_betais <- function(sst_update, spline_params){
 
   })
 
-  betais
+  list(
+  	betais = betais,
+  	Theta = Theta,
+  	beta_mean = Matrix(
+      c(Theta_list[[1]]$mean, Theta_list[[2]]$mean, Theta_list[[3]]$mean, 
+        Theta_list[[4]]$mean, Theta_list[[5]]$mean)
+    )
+  )
 
 }

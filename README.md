@@ -34,7 +34,9 @@ data used in the paper. Namely,
   - <tt>sic\_data</tt> that contains binary estimates of SIC inferred
     from Northern and Southern hemisphere maximum sea-ice extents.
 
-![SST Data](images/sst_data_plot.png)
+<!-- ![SST Data](images/sst_data_plot.png) -->
+
+/
 
 # Sea-surface temperature
 
@@ -45,16 +47,18 @@ updates. Our prior belief specifications are stored as a tibble in
 <tt>params\_prior</tt>.
 
 ``` r
-H_list <- generate_Hx(pmip_sst, margo_pseudo)
+H_list <- generate_Hx(model_data, sst_data)
 
-params_prior <- tibble(
+sst_prior_params <- tibble(
   tau = 6,
-  alpha = 0.921,
+  c = 0.921,
   kappa = 1.61,
-  beta = 1
+  alpha2 = 1
 )
 
-sst_update <- calculate_sst_update(pmip_sst, margo_pseudo, H_list, params_prior)
+sst_update <- calculate_sst_update(
+  model_data, sst_data, H_list, sst_prior_params
+)
 ```
 
 # Update sea-ice concentration
@@ -72,5 +76,16 @@ spline_params <- list(
   prior_exp = c(0.40, .40, 0.2, 0, 0)
 )
 
+sic_prior_params <- list(
+  corW_params = c(6, 4, 1, 0),
+  varU_params = c(6, 4, 0.3, 0)
+)
+
 betais <- project_betais(sst_update, spline_params)
+
+Xstar <- as.numeric(sst_update$E)
+
+sic_update <- calculate_sic_update(
+  sst_update, spline_params, sic_prior_params, betais, Xstar, sic_data
+)
 ```
