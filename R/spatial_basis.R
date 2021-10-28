@@ -7,12 +7,11 @@
 #' @return returns Matrix object
 #' @export
 create_psii <- function(model_tmp, spline_params){
-  Y <- model_tmp$ice
   ntime <- 12
   ns <- nrow(model_tmp %>% filter(time == 1))
   nl <- length(spline_params$prior_exp)
 
-
+  options(warn = -1)
   psi <- do.call(
     rbind,
     lapply(1:12, function(j){
@@ -34,7 +33,8 @@ create_psii <- function(model_tmp, spline_params){
       ) %>% Matrix()
     })
   )
-
+  options(warn = 0)
+  return(psi)
 }
 
 #' Calculate Theta Matrix
@@ -59,6 +59,6 @@ create_theta <- function(all_fits, idx_select){
   list(
     mean = proj_mean,
     theta = svd(proj_values - proj_mean)$u[, 1:(m-1)],
-    lambda = svd(proj_values - proj_mean)$d[, 1:(m-1)] 
+    lambda = svd(proj_values - proj_mean)$d[1:(m-1)] 
   )
 }

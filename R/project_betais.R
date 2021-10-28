@@ -19,11 +19,11 @@ project_betais <- function(sst_update, spline_params){
 
   betais <- lapply(1:m, function(i){
 
-    cat(sprintf("\rProjecting beta %i/%i ", i, m))
+    cat(sprintf("\rProjecting onto the beta_i (%.0f%%)          ", 100*(i-1)/m))
 
     Yi_tibble <- sst_update$simulation$data %>%
-    filter(model == model_names[i]) %>%
-    arrange(time, lon, lat)
+      filter(model == model_names[i]) %>%
+      arrange(time, lon, lat)
 
     Psii <- create_psii(Yi_tibble, spline_params)
 

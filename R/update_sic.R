@@ -11,12 +11,13 @@ calculate_sic_update <- function(
   sst_update, spline_params, sic_prior_params, betais, Xstar, sic_data
 ){
 
-  base::cat(base::sprintf("\r Variance Matrices            "))
+  base::cat(base::sprintf("\r Setting up matrices            "))
 
   m <- sst_update$simulation$m
   coords <- sst_update$simulation$coords
   ns <- sst_update$simulation$n
   nl <- length(spline_params$prior_exp)
+  k <- nl * (m-1)
 
   # ###################################
   # VARIANCE MATRICES NEED TO BE FIGURED OUT
@@ -29,7 +30,7 @@ calculate_sic_update <- function(
   # ###################################
 
   R_list <- rep(list(var_Rbeta), m)
-  R_list[[m+1]] <- matrix(0, ncol = nl*m, nrow = nl*m)
+  R_list[[m+1]] <- matrix(0, ncol = k, nrow = k)
 
   varM <- do.call(
     rbind,
@@ -39,22 +40,22 @@ calculate_sic_update <- function(
   varB <- varM + bdiag(R_list)
   varR <- bdiag(bdiag(rep(list(var_Rhat), m)), bdiag(rep(list(var_Rbeta), m)))
 
-  Bhat <- rbind(do.call(rbind, betais$betais), matrix(rep(0, nl * m^2)))
+  Bhat <- rbind(do.call(rbind, betais$betais), matrix(rep(0, k * m)))
   
   Xhat <- rbind(
-    cbind(diag(rep(1, nl * m^2)), matrix(0, nrow = nl*m^2, ncol = nl*m)),
-    cbind(-diag(rep(1, nl * m^2)), kronecker(matrix(rep(1, m)), diag(rep(1, nl*m))))
+    cbind(diag(rep(1, k * m)), matrix(0, nrow = k * m, ncol = k)),
+    cbind(-diag(rep(1, k * m)), kronecker(matrix(rep(1, m)), diag(rep(1, k))))
   )
 
   Psi_star <- bind_cols(
-    sst_update$simulation$means %>% dplyr::select(-sst), 
-    tibble(sst = Xstar)
-  ) %>%
-  arrange(time, lon, lat) %>%
-  mutate(sst = ifelse(sst < spline_params$bounds[1], spline_params$bounds[1], sst)) %>%
-  create_psii(spline_params)    
+      sst_update$simulation$means %>% dplyr::select(-sst), 
+      tibble(sst = Xstar)
+    ) %>%
+    arrange(time, lon, lat) %>%
+    mutate(sst = ifelse(sst < spline_params$bounds[1], spline_params$bounds[1], sst)) %>%
+    create_psii(spline_params)    
 
-  base::cat(base::sprintf("\r First Update            "))
+  base::cat(base::sprintf("\r Calculating first update            "))
 
   # Updates
   V1inv <- solve(Xhat %*% varB %*% t(Xhat) + varR)
@@ -62,12 +63,12 @@ calculate_sic_update <- function(
   adj_exp_B <- varB %*% t(Xhat) %*% V1inv %*% Bhat
   adj_var_B <- varB - varB %*% t(Xhat) %*% V1inv %*% Xhat %*% varB
 
-  adj_exp_Mbeta <- tail(as.numeric(adjB), nl*m)
-  adj_var_Mbeta <- adj_var_B[(nl*m*m+1):(nl*m*(m+1)), (nl*m*m+1):(nl*m*(m+1))]
+  adj_exp_Mbeta <- tail(as.numeric(adj_exp_B), k)
+  adj_var_Mbeta <- adj_var_B[(m*k+1):((m+1)*k), (m*k+1):((m+1)*k)]
 
   Mx <- Psi_star %*% (Theta %*% adj_exp_Mbeta + betais$beta_mean)
 
-  base::cat(base::sprintf("\r Second Update            "))
+  base::cat(base::sprintf("\r Calculating second update                 "))
 
   ptmp <- sic_prior_params$corW_params
 
@@ -92,28 +93,23 @@ calculate_sic_update <- function(
 
   varU <- bdiag(varUi, varUi, varUi, varUi, varUi)
 
-  # sic_data <- sic_data %>%
-  #   mutate(sd = ifelse(sd == 0.5, 1, sd))
-
   varW <- Matrix(diag(sic_data$sd)) %*% corW %*% Matrix(diag(sic_data$sd))
-  varDisc <- Psi_reality %*% 
+  varDisc <- Psi_star %*% 
     (varU + Theta %*% adj_var_Mbeta %*% t(Theta)) %*% 
-    t(Psi_reality)
+    t(Psi_star)
   V2_inv <- solve(Hy %*% varDisc %*% t(Hy) + varW + diag(rep(1e-8, nrow(varW))))
 
-  base::cat(base::sprintf("\r Second Update E            "))
+  base::cat(base::sprintf("\r Calculating second update (exp)            "))
 
   E_ice_update <- Mx + varDisc %*% t(Hy) %*% V2_inv %*% 
     (Matrix(sic_data$ice_meas) - (Hy %*% Mx))
 
-  tmp1 <- varU %*% t(Psi_reality) %*% t(Hy)
+  base::cat(base::sprintf("\r Calculating second update (var)            "))
+# check math here
+  tmp1 <- varU %*% t(Psi_star) %*% t(Hy)
   tmp2 <- tmp1 %*% V2_inv %*% t(tmp1)
   tmp3 <- varU - tmp2
-
-  base::cat(base::sprintf("\r Second Update V            "))
-
-  V_ice_update <- Psi_reality %*% tmp3 %*% t(Psi_reality)
-  # V_ice_update <- varDisc - varDisc %*% t(Hy) %*% V2_inv %*% Hy %*% varDisc
+  V_ice_update <- Psi_star %*% tmp3 %*% t(Psi_star)
 
   update_tbl <- sst_update$simulation$means %>%
     arrange(time, lon, lat) %>%

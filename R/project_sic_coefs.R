@@ -12,14 +12,17 @@ project_sic_coefs <- function(
   spline_params
 ){
 
-  base::cat(base::sprintf("\r Projecting spline coefficients"))
+  base::cat(base::sprintf("\r Generating spatial bases          "))
 
   model_names <- sst_update$simulation$data$model %>% base::unique()
 
   ice_fits <- sst_update$simulation$data %>%
     dplyr::filter(sst < spline_params$bounds[2]) %>%
     dplyr::group_by(lat, lon, model) %>%
-    dplyr::summarise(beta = fit_spline(sst, ice, spline_params))
+    dplyr::summarise(
+      beta = fit_spline(sst, ice, spline_params),
+      .groups = "keep"
+    )
 
   ice_fits <- dplyr::bind_cols(ice_fits %>% dplyr::select(-beta), ice_fits$beta) 
 
@@ -40,14 +43,14 @@ project_sic_coefs <- function(
     )[,c(2,3)]
   ) %>%
     dplyr::left_join(ice_fits, by = c("lat", "lon", "model", "idx")) %>%
-    dplyr::rowwise() %>%
-    dplyr::mutate(
-      beta = base::ifelse(beta > 1.5, 1.5, beta),
-      beta = base::ifelse(base::is.na(beta), prior[idx], beta)
-    ) %>%
     group_by(idx, model) %>%
     arrange(lon, lat) %>%
-    summarise(lon = lon, lat = lat, beta = as.numeric(W %*% beta)) %>%
+    summarise(
+      lon = lon, lat = lat, beta = as.numeric(W %*% beta), 
+      .groups = "keep"
+    ) %>%
+    rowwise() %>%
+    mutate(beta = ifelse(is.na(beta), spline_params$prior[idx], beta)) %>%
     arrange(lon, lat) %>%
     ungroup()
 
