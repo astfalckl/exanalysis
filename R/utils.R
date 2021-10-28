@@ -82,21 +82,22 @@ fit_spline <- function(sst, ice, spline_params){
   
   X <- calc_X(sst, spline_params)
 
-  beta <- exp(
-    stats::optim(
-      log(spline_params$prior_exp+0.001), 
+  beta_tmp <- stats::optim(
+      log((spline_params$prior_exp + 0.001)/
+        (1 - 0.001 - spline_params$prior_exp)), 
       loss, 
       gr = NULL, 
       X, ice, spline_params$prior_exp
     )$par
-  )
+
+  beta <- exp(beta_tmp)/(exp(beta_tmp) + 1)
   
   return(dplyr::tibble(beta = beta, idx = 1:5))
 
 }
 
 loss <- function(log_beta, X, ice, priors){
-  beta <- exp(log_beta)
+  beta <- exp(log_beta)/(exp(log_beta) + 1)
   sum((X %*% beta - ice)^2) + 0.05 * sum((beta - priors)^2)
 }
 

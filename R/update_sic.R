@@ -11,6 +11,8 @@ calculate_sic_update <- function(
   sst_update, spline_params, sic_prior_params, betais, Xstar, sic_data
 ){
 
+  base::cat(base::sprintf("\r Variance Matrices            "))
+
   m <- sst_update$simulation$m
   coords <- sst_update$simulation$coords
   ns <- sst_update$simulation$n
@@ -55,6 +57,8 @@ calculate_sic_update <- function(
     mutate(sst = ifelse(sst < -1.92, -1.92, sst)) %>%
     create_psii(spline_params)
 
+  base::cat(base::sprintf("\r First Update            "))
+
   # Updates
   V1inv <- solve(Xhat %*% varB %*% t(Xhat) + varR)
   
@@ -65,6 +69,8 @@ calculate_sic_update <- function(
   adj_var_Mbeta <- adj_var_B[(nl*m*m+1):(nl*m*(m+1)), (nl*m*m+1):(nl*m*(m+1))]
 
   Mx <- Psi_star %*% (Theta %*% adj_exp_Mbeta + betais$beta_mean)
+
+  base::cat(base::sprintf("\r Second Update            "))
 
   ptmp <- sic_prior_params$corW_params
 
@@ -96,12 +102,16 @@ calculate_sic_update <- function(
   varDisc <- Psi_reality %*% varU %*% t(Psi_reality)
   V2_inv <- solve(Hy %*% varDisc %*% t(Hy) + varW + diag(rep(1e-8, nrow(varW))))
 
+  base::cat(base::sprintf("\r Second Update E            "))
+
   E_ice_update <- Mx + varDisc %*% t(Hy) %*% V2_inv %*% 
     (Matrix(sic_data$ice_meas) - (Hy %*% Mx))
 
   tmp1 <- varU %*% t(Psi_reality) %*% t(Hy)
   tmp2 <- tmp1 %*% V2_inv %*% t(tmp1)
   tmp3 <- varU - tmp2
+
+  base::cat(base::sprintf("\r Second Update V            "))
 
   V_ice_update <- Psi_reality %*% tmp3 %*% t(Psi_reality)
   # V_ice_update <- varDisc - varDisc %*% t(Hy) %*% V2_inv %*% Hy %*% varDisc

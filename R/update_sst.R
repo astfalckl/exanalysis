@@ -58,7 +58,7 @@ calculate_sst_update <- function(simulation, proxy, H_list, params, incl_varM = 
 
 	cat(sprintf("\rCalculating updates...     "))
 
-	E <- M + Matrix::t(HvarY1) %*% solveU %*% as.matrix(error)
+	E <- M + Matrix::t(HvarY) %*% solveU %*% as.matrix(error)
 
 	Vs <- varYS - Matrix::t(HsvarYs) %*% solveU %*% HsvarYs
 	Vt <- varT
