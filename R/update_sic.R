@@ -21,9 +21,11 @@ calculate_sic_update <- function(
   # ###################################
   # VARIANCE MATRICES NEED TO BE FIGURED OUT
   var_beta_tbd <- diag(diag(cov(t(as.matrix(do.call(cbind, betais$betais))))))
-  var_Rhat <- 0.05 * var_beta_tbd
   var_Rbeta <- 0.5 * var_beta_tbd
   var_Mbeta <- 0.5 * var_beta_tbd
+
+  
+  var_Rhat <- 0.05 * var_beta_tbd
   # ###################################
 
   R_list <- rep(list(var_Rbeta), m)
@@ -44,18 +46,13 @@ calculate_sic_update <- function(
     cbind(-diag(rep(1, nl * m^2)), kronecker(matrix(rep(1, m)), diag(rep(1, nl*m))))
   )
 
-  Psi_star <- sst_update$simulation$data %>%
-    filter(model == model_names[1]) %>%
-    arrange(time, lon, lat) %>%
-    dplyr::select(-sst, -model) %>%
-    left_join(
-      bind_cols(
-        sst_update$simulation$means, 
-        tibble(Xstar = Xstar)
-      )
-    ) %>%
-    mutate(sst = ifelse(sst < -1.92, -1.92, sst)) %>%
-    create_psii(spline_params)
+  Psi_star <- bind_cols(
+    sst_update$simulation$means %>% dplyr::select(-sst), 
+    tibble(sst = Xstar)
+  ) %>%
+  arrange(time, lon, lat) %>%
+  mutate(sst = ifelse(sst < spline_params$bounds[1], spline_params$bounds[1], sst)) %>%
+  create_psii(spline_params)    
 
   base::cat(base::sprintf("\r First Update            "))
 
@@ -99,7 +96,9 @@ calculate_sic_update <- function(
   #   mutate(sd = ifelse(sd == 0.5, 1, sd))
 
   varW <- Matrix(diag(sic_data$sd)) %*% corW %*% Matrix(diag(sic_data$sd))
-  varDisc <- Psi_reality %*% varU %*% t(Psi_reality)
+  varDisc <- Psi_reality %*% 
+    (varU + Theta %*% adj_var_Mbeta %*% t(Theta)) %*% 
+    t(Psi_reality)
   V2_inv <- solve(Hy %*% varDisc %*% t(Hy) + varW + diag(rep(1e-8, nrow(varW))))
 
   base::cat(base::sprintf("\r Second Update E            "))

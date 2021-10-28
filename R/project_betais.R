@@ -8,7 +8,6 @@
 #' @export
 project_betais <- function(sst_update, spline_params){
 
-  # THIS HAS TO BE DONE BETTER
   svd_beta_projection <- project_sic_coefs(sst_update, spline_params)
 
   Theta_list <- lapply(1:5, function(i){

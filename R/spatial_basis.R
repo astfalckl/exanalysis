@@ -54,9 +54,11 @@ create_theta <- function(all_fits, idx_select){
 
   proj_mean <- rowMeans(proj_values)
 
+  m <- ncol(proj_values)
+
   list(
     mean = proj_mean,
-    theta = svd(proj_values - proj_mean)$u,
-    lambda = svd(proj_values - proj_mean)$d 
+    theta = svd(proj_values - proj_mean)$u[, 1:(m-1)],
+    lambda = svd(proj_values - proj_mean)$d[, 1:(m-1)] 
   )
 }

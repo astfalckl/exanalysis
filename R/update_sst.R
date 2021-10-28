@@ -13,9 +13,11 @@
 #'
 #' @return Returns loss
 #' @export
-calculate_sst_update <- function(simulation, proxy, H_list, params, incl_varM = FALSE){
+calculate_sst_update <- function(
+	simulation, proxy, H_list, params, incl_varM = FALSE, sst_min = -1.92
+){
 
-	cat(sprintf("\rSetting up bits...         "))
+	cat(sprintf("\r Setting up matrices         "))
 
 	varS <- fields::rdist.earth(as.matrix(simulation$coords), R = 1) %>% 
 	  wendland(params$tau, params$c, params$kappa, 1e-06) %>%
@@ -28,19 +30,15 @@ calculate_sst_update <- function(simulation, proxy, H_list, params, incl_varM = 
 
 	M_scale <- params$alpha2/(simulation$m + params$alpha2)
 
-	ns <- simulation$n	
-	varMs <- matrix(0, nrow = ns, ncol = ns)
+	# ns <- simulation$n	
 
+	varMs <- matrix(0, nrow = simulation$n, ncol = simulation$n)
 	if(incl_varM){varMs <- calculate_Ms(simulation)}
-
-	mask <- as.matrix(varS)
-	mask[which(as.matrix(varS) != 0)] <- 1
-
-	varYS <- varS + M_scale/2 * Matrix(varMs) #Matrix(mask * varMs)
+	varYS <- varS + M_scale/2 * Matrix(varMs)
 
 	one <- matrix(1/simulation$ntime, nrow = simulation$ntime, ncol = 1)
 
-	cat(sprintf("\rCalculating H components..."))
+	cat(sprintf("\r Pre-calculating components        "))
 
 	# HvarY <- H_list$Hs %*% rbind(varYS, varYS)
 	HsvarYs <- H_list$Hs %*% rbind(varYS, varYS)
@@ -56,19 +54,19 @@ calculate_sst_update <- function(simulation, proxy, H_list, params, incl_varM = 
 
 	error <- as.numeric(matrix(proxy$data$sst_obs) - HM - proxy$B)
 
-	cat(sprintf("\rCalculating updates...     "))
+	cat(sprintf("\r Computing belief updates        "))
 
 	E <- M + Matrix::t(HvarY) %*% solveU %*% as.matrix(error)
 
 	Vs <- varYS - Matrix::t(HsvarYs) %*% solveU %*% HsvarYs
 	Vt <- varT
 
-	update_tbl <- sst_update$simulation$means %>%
+	update_tbl <- simulation$means %>%
 		rename(Eadj1 = sst) %>%
 		mutate(
 			Vadj1 = rep(diag(varYS), each = 12),
 			Eadj2 = as.numeric(E),
-			Eadj2 = ifelse(Eadj2 < -1.92, -1.92, Eadj2),
+			Eadj2 = ifelse(Eadj2 < sst_min, sst_min, Eadj2),
 			Vadj2 = rep(diag(Vs), each = 12)
 		)
 

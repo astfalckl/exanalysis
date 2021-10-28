@@ -13,7 +13,7 @@ generate_Hx <- function(simulation, proxy){
 
   # Calculate Hs
 
-  cat(sprintf("\rCalculating Hs..."))
+  cat(sprintf("\r Calculating Hs..."))
 
   tau_hat <- 6
   alpha_hat <- 1.3
@@ -52,7 +52,7 @@ generate_Hx <- function(simulation, proxy){
 
   # Calculate Ht 
 
-  cat(sprintf("\rCalculating Ht..."))
+  cat(sprintf("\r Calculating Ht..."))
 
   Ht_ann <- Matrix::Matrix(
     kronecker(
@@ -70,7 +70,7 @@ generate_Hx <- function(simulation, proxy){
 
   Ht <- rbind(Ht_ann, Ht_jfm)
 
-  cat(sprintf("\rCalculating H... "))
+  cat(sprintf("\r Calculating H... "))
 
   return(
     list(

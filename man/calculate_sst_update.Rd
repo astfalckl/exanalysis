@@ -4,7 +4,14 @@
 \alias{calculate_sst_update}
 \title{Calculate the SST update}
 \usage{
-calculate_sst_update(simulation, proxy, H_list, params, incl_varM = NULL)
+calculate_sst_update(
+  simulation,
+  proxy,
+  H_list,
+  params,
+  incl_varM = FALSE,
+  sst_min = -1.92
+)
 }
 \arguments{
 \item{simulation}{a sst_sim object containing the sst simulations}

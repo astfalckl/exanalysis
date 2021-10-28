@@ -101,26 +101,26 @@ loss <- function(log_beta, X, ice, priors){
   sum((X %*% beta - ice)^2) + 0.05 * sum((beta - priors)^2)
 }
 
-calc_ice <- function(spline_params, sst_value, betas){
+# calc_ice <- function(spline_params, sst_value, betas){
 
-  if (sst_value > spline_params$bounds[2]){
+#   if (sst_value > spline_params$bounds[2]){
 
-    return(0)
+#     return(0)
 
-  } else if (sst_value < spline_params$bounds[1]){
+#   } else if (sst_value < spline_params$bounds[1]){
 
-    return(1)
+#     return(1)
 
-  } else{
+#   } else{
 
-    X <- calc_X(sst_value, spline_params)
-    betas <- as.matrix(betas)
+#     X <- calc_X(sst_value, spline_params)
+#     betas <- as.matrix(betas)
 
-    as.numeric(X %*% betas)
+#     as.numeric(X %*% betas)
 
-  }
+#   }
 
-}
+# }
 
 # priors <- c(0.05, 0.7, 0.15, 0.01, 0.01)
 

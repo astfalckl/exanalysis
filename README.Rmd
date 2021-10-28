@@ -70,24 +70,23 @@ Calculating SIC belief updates require a bit more involvement than the SST updat
 ```{r, eval = FALSE}
 spline_params <- list(
   bounds = c(-1.92, 10),
-  knots = c(-1, -0.5, 1.229281),
+  knots = c(-1.15, -0.32, 1.44),
   degree = 1,
-  prior_exp = c(0.40, .40, 0.2, 0, 0)
-)
-
-sic_prior_params <- list(
-  corW_params = c(6, 4, 1, 0),
-  varU_params = c(6, 4, 0.3, 0)
+  prior_exp = c(0.16, 0.47, 0.27, 0.1, 0)
 )
 
 betais <- project_betais(sst_update, spline_params)
 
 Xstar <- as.numeric(sst_update$E)
 
+sic_prior_params <- list(
+  corW_params = c(6, 4, 1, 0),
+  varU_params = c(6, 4, 0.3, 0)
+)
+
 sic_update <- calculate_sic_update(
   sst_update, spline_params, sic_prior_params, betais, Xstar, sic_data
 )
-
 ```
 
 
