@@ -6,7 +6,7 @@
 #' @export
 calculate_Ms <- function(model_data){
 
-  varMs <- matrix(0, nrow = ns, ncol = ns)
+  varMs <- matrix(0, nrow = model_data$n, ncol = model_data$n)
   count <- 0
   for (i in 1:12){
     for (j in 1:12){  

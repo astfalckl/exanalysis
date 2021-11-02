@@ -30,8 +30,6 @@ calculate_sst_update <- function(
 
 	M_scale <- params$alpha2/(simulation$m + params$alpha2)
 
-	# ns <- simulation$n	
-
 	varMs <- matrix(0, nrow = simulation$n, ncol = simulation$n)
 	if(incl_varM){varMs <- calculate_Ms(simulation)}
 	varYS <- varS + M_scale/2 * Matrix(varMs)
@@ -64,10 +62,10 @@ calculate_sst_update <- function(
 	update_tbl <- simulation$means %>%
 		rename(Eadj1 = sst) %>%
 		mutate(
-			Vadj1 = rep(diag(varYS), each = 12),
+			Vadj1 = rep(base::diag(as.matrix(varYS)), each = 12),
 			Eadj2 = as.numeric(E),
 			Eadj2 = ifelse(Eadj2 < sst_min, sst_min, Eadj2),
-			Vadj2 = rep(diag(Vs), each = 12)
+			Vadj2 = rep(base::diag(as.matrix(Vs)), each = 12)
 		)
 
 	return(

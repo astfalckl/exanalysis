@@ -14,20 +14,15 @@ calculate_sic_update <- function(
   base::cat(base::sprintf("\r Setting up matrices            "))
 
   m <- sst_update$simulation$m
+  model_names <- sst_update$simulation$data$model %>% unique()
   coords <- sst_update$simulation$coords
   ns <- sst_update$simulation$n
   nl <- length(spline_params$prior_exp)
   k <- nl * (m-1)
 
-  # ###################################
-  # VARIANCE MATRICES NEED TO BE FIGURED OUT
-  var_beta_tbd <- diag(diag(cov(t(as.matrix(do.call(cbind, betais$betais))))))
-  var_Rbeta <- 0.5 * var_beta_tbd
-  var_Mbeta <- 0.5 * var_beta_tbd
-
-  
-  var_Rhat <- 0.05 * var_beta_tbd
-  # ###################################
+  var_beta <- diag(diag(cov(t(as.matrix(do.call(cbind, betais$betais))))))
+  var_Rbeta <- 0.5 * var_beta
+  var_Mbeta <- 0.5 * var_beta
 
   R_list <- rep(list(var_Rbeta), m)
   R_list[[m+1]] <- matrix(0, ncol = k, nrow = k)
@@ -38,7 +33,8 @@ calculate_sic_update <- function(
       list() %>% rep(m+1)
   )
   varB <- varM + bdiag(R_list)
-  varR <- bdiag(bdiag(rep(list(var_Rhat), m)), bdiag(rep(list(var_Rbeta), m)))
+  # varR <- bdiag(bdiag(rep(list(var_Rhat), m)), bdiag(rep(list(var_Rbeta), m)))
+  varR <- bdiag(bdiag(var_Rhats), bdiag(rep(list(var_Rbeta), m)))
 
   Bhat <- rbind(do.call(rbind, betais$betais), matrix(rep(0, k * m)))
   
@@ -114,10 +110,15 @@ calculate_sic_update <- function(
   update_tbl <- sst_update$simulation$means %>%
     arrange(time, lon, lat) %>%
     mutate(
-      E = as.numeric(E_ice_update),
-      E = ifelse(E > 1, 1, E),
-      E = ifelse(E < 0, 0, E),
-      V = diag(V_ice_update)
+      Eadj1 = as.numeric(Mx),
+      Vadj1 = diag(Psi_star %*% Theta %*% adj_var_Mbeta %*% 
+        t(Theta) %*% t(Psi_star)),
+      Eadj2 = as.numeric(E_ice_update),
+      Vadj2 = diag(V_ice_update),
+      Eadj1 = ifelse(Eadj1 > 1, 1, Eadj1),
+      Eadj1 = ifelse(Eadj1 < 0, 0, Eadj1),
+      Eadj2 = ifelse(Eadj2 > 1, 1, Eadj2),
+      Eadj2 = ifelse(Eadj2 < 0, 0, Eadj2)
     )
 
   list(
