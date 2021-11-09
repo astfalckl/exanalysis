@@ -34,7 +34,8 @@ calculate_sic_update <- function(
   )
   varB <- varM + bdiag(R_list)
   # varR <- bdiag(bdiag(rep(list(var_Rhat), m)), bdiag(rep(list(var_Rbeta), m)))
-  varR <- bdiag(bdiag(var_Rhats), bdiag(rep(list(var_Rbeta), m)))
+  # varR <- bdiag(bdiag(var_Rhats), bdiag(rep(list(var_Rbeta), m)))
+  varR <- bdiag(0.10 * bdiag(var_Rhats), bdiag(rep(list(var_Rbeta), m)))
 
   Bhat <- rbind(do.call(rbind, betais$betais), matrix(rep(0, k * m)))
   
@@ -54,15 +55,17 @@ calculate_sic_update <- function(
   base::cat(base::sprintf("\r Calculating first update            "))
 
   # Updates
-  V1inv <- solve(Xhat %*% varB %*% t(Xhat) + varR)
+  V1inv <- solve(Xhat %*% varB %*% Matrix::t(Xhat) + varR)
   
-  adj_exp_B <- varB %*% t(Xhat) %*% V1inv %*% Bhat
-  adj_var_B <- varB - varB %*% t(Xhat) %*% V1inv %*% Xhat %*% varB
+  adj_exp_B <- varB %*% Matrix::t(Xhat) %*% V1inv %*% Bhat
+  adj_var_B <- varB - varB %*% Matrix::t(Xhat) %*% V1inv %*% Xhat %*% varB
 
   adj_exp_Mbeta <- tail(as.numeric(adj_exp_B), k)
   adj_var_Mbeta <- adj_var_B[(m*k+1):((m+1)*k), (m*k+1):((m+1)*k)]
 
-  Mx <- Psi_star %*% (Theta %*% adj_exp_Mbeta + betais$beta_mean)
+  Mx <- Psi_star %*% (betais$Theta %*% adj_exp_Mbeta + betais$beta_mean)
+  # Vadj1 <- Psi_star %*% betais$Theta %*% adj_var_Mbeta %*% 
+  #       Matrix::t(betais$Theta) %*% Matrix::t(Psi_star)
 
   base::cat(base::sprintf("\r Calculating second update                 "))
 
@@ -91,28 +94,27 @@ calculate_sic_update <- function(
 
   varW <- Matrix(diag(sic_data$sd)) %*% corW %*% Matrix(diag(sic_data$sd))
   varDisc <- Psi_star %*% 
-    (varU + Theta %*% adj_var_Mbeta %*% t(Theta)) %*% 
-    t(Psi_star)
-  V2_inv <- solve(Hy %*% varDisc %*% t(Hy) + varW + diag(rep(1e-8, nrow(varW))))
+    (varU + betais$Theta %*% adj_var_Mbeta %*% Matrix::t(betais$Theta)) %*% 
+    Matrix::t(Psi_star)
+  V2_inv <- solve(Hy %*% varDisc %*% Matrix::t(Hy) + varW + diag(rep(1e-8, nrow(varW))))
 
   base::cat(base::sprintf("\r Calculating second update (exp)            "))
 
-  E_ice_update <- Mx + varDisc %*% t(Hy) %*% V2_inv %*% 
+  E_ice_update <- Mx + varDisc %*% Matrix::t(Hy) %*% V2_inv %*% 
     (Matrix(sic_data$ice_meas) - (Hy %*% Mx))
 
   base::cat(base::sprintf("\r Calculating second update (var)            "))
 # check math here
-  tmp1 <- varU %*% t(Psi_star) %*% t(Hy)
-  tmp2 <- tmp1 %*% V2_inv %*% t(tmp1)
+  tmp1 <- varU %*% Matrix::t(Psi_star) %*% Matrix::t(Hy)
+  tmp2 <- tmp1 %*% V2_inv %*% Matrix::t(tmp1)
   tmp3 <- varU - tmp2
-  V_ice_update <- Psi_star %*% tmp3 %*% t(Psi_star)
+  V_ice_update <- Psi_star %*% tmp3 %*% Matrix::t(Psi_star)
 
   update_tbl <- sst_update$simulation$means %>%
     arrange(time, lon, lat) %>%
     mutate(
       Eadj1 = as.numeric(Mx),
-      Vadj1 = diag(Psi_star %*% Theta %*% adj_var_Mbeta %*% 
-        t(Theta) %*% t(Psi_star)),
+      Vadj1 = Matrix::diag(varDisc),
       Eadj2 = as.numeric(E_ice_update),
       Vadj2 = diag(V_ice_update),
       Eadj1 = ifelse(Eadj1 > 1, 1, Eadj1),

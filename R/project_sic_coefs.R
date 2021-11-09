@@ -28,11 +28,11 @@ project_sic_coefs <- function(
 
   prior <- spline_params$prior_exp
 
-  smooth <- fields::rdist.earth(as.matrix(simulation$coords), R = 1) %>% 
+  smooth <- fields::rdist.earth(as.matrix(sst_update$simulation$coords), R = 1) %>% 
     wendland(10, 4, 1, 1e-06) %>%
     Matrix::Matrix()
 
-  W <- smooth/rowSums(smooth)
+  W <- smooth/Matrix::rowSums(smooth)
 
   all_ice_fits <- dplyr::bind_cols(
     tidyr::expand_grid(

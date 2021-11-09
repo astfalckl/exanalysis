@@ -8,6 +8,8 @@
 #' @export
 project_betais <- function(sst_update, spline_params){
 
+  model_names <- sst_update$simulation$data$model %>% unique()
+
   svd_beta_projection <- project_sic_coefs(sst_update, spline_params)
 
   Theta_list <- lapply(1:5, function(i){
@@ -17,9 +19,10 @@ project_betais <- function(sst_update, spline_params){
   Theta <- bdiag(Theta_list[[1]]$theta, Theta_list[[2]]$theta, Theta_list[[3]]$theta,
     Theta_list[[4]]$theta, Theta_list[[5]]$theta)
 
-  betais <- lapply(1:m, function(i){
+  betais <- lapply(1:sst_update$simulation$m, function(i){
 
-    cat(sprintf("\rProjecting onto the beta_i (%.0f%%)          ", 100*(i-1)/m))
+    cat(sprintf("\rProjecting onto the beta_i (%.0f%%)          ", 100*(i-1)/
+      sst_update$simulation$m))
 
     Yi_tibble <- sst_update$simulation$data %>%
       filter(model == model_names[i]) %>%
@@ -38,7 +41,7 @@ project_betais <- function(sst_update, spline_params){
 
     Phii <- Psii %*% Theta
 
-    betai <- solve(as.matrix(t(Phii) %*% Phii)) %*% t(Phii) %*% (Y - Y_mean)
+    betai <- solve(as.matrix(Matrix::t(Phii) %*% Phii)) %*% Matrix::t(Phii) %*% (Y - Y_mean)
 
     betai
 
