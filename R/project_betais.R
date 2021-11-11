@@ -16,8 +16,10 @@ project_betais <- function(sst_update, spline_params){
     create_theta(svd_beta_projection, i)
   })
 
-  Theta <- bdiag(Theta_list[[1]]$theta, Theta_list[[2]]$theta, Theta_list[[3]]$theta,
-    Theta_list[[4]]$theta, Theta_list[[5]]$theta)
+  Theta <- Matrix::bdiag(
+    Theta_list[[1]]$theta, Theta_list[[2]]$theta, Theta_list[[3]]$theta,
+    Theta_list[[4]]$theta, Theta_list[[5]]$theta
+  )
 
   betais <- lapply(1:sst_update$simulation$m, function(i){
 
@@ -25,14 +27,14 @@ project_betais <- function(sst_update, spline_params){
       sst_update$simulation$m))
 
     Yi_tibble <- sst_update$simulation$data %>%
-      filter(model == model_names[i]) %>%
-      arrange(time, lon, lat)
+      dplyr::filter(model == model_names[i]) %>%
+      dplyr::arrange(time, lon, lat)
 
     Psii <- create_psii(Yi_tibble, spline_params)
 
-    Y <- Matrix(Yi_tibble$ice)
+    Y <- Matrix::Matrix(Yi_tibble$ice)
 
-    beta_mean <- Matrix(
+    beta_mean <- Matrix::Matrix(
       c(Theta_list[[1]]$mean, Theta_list[[2]]$mean, Theta_list[[3]]$mean, 
         Theta_list[[4]]$mean, Theta_list[[5]]$mean)
     )
@@ -41,16 +43,14 @@ project_betais <- function(sst_update, spline_params){
 
     Phii <- Psii %*% Theta
 
-    betai <- solve(as.matrix(Matrix::t(Phii) %*% Phii)) %*% Matrix::t(Phii) %*% (Y - Y_mean)
-
-    betai
+    solve(as.matrix(Matrix::t(Phii) %*% Phii)) %*% Matrix::t(Phii) %*% (Y - Y_mean)
 
   })
 
   list(
   	betais = betais,
   	Theta = Theta,
-  	beta_mean = Matrix(
+  	beta_mean = Matrix::Matrix(
       c(Theta_list[[1]]$mean, Theta_list[[2]]$mean, Theta_list[[3]]$mean, 
         Theta_list[[4]]$mean, Theta_list[[5]]$mean)
     )

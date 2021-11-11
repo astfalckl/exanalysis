@@ -20,7 +20,18 @@ calculate_sic_update <- function(
   nl <- length(spline_params$prior_exp)
   k <- nl * (m-1)
 
-  var_beta <- diag(diag(cov(t(as.matrix(do.call(cbind, betais$betais))))))
+  var_beta <- diag(
+    diag(
+      cov(
+        base::t(
+          as.matrix(
+            do.call(cbind, betais$betais)
+          )
+        )
+      )
+    )
+  )
+
   var_Rbeta <- 0.5 * var_beta
   var_Mbeta <- 0.5 * var_beta
 
@@ -32,10 +43,10 @@ calculate_sic_update <- function(
     do.call(cbind, rep(list(var_Mbeta), m+1)) %>%
       list() %>% rep(m+1)
   )
-  varB <- varM + bdiag(R_list)
-  # varR <- bdiag(bdiag(rep(list(var_Rhat), m)), bdiag(rep(list(var_Rbeta), m)))
-  # varR <- bdiag(bdiag(var_Rhats), bdiag(rep(list(var_Rbeta), m)))
-  varR <- bdiag(0.10 * bdiag(var_Rhats), bdiag(rep(list(var_Rbeta), m)))
+  varB <- varM + Matrix::bdiag(R_list)
+  # varR <- Matrix::bdiag(Matrix::bdiag(rep(list(var_Rhat), m)), Matrix::bdiag(rep(list(var_Rbeta), m)))
+  # varR <- Matrix::bdiag(Matrix::bdiag(var_Rhats), Matrix::bdiag(rep(list(var_Rbeta), m)))
+  varR <- Matrix::bdiag(0.10 * Matrix::bdiag(var_Rhats), Matrix::bdiag(rep(list(var_Rbeta), m)))
 
   Bhat <- rbind(do.call(rbind, betais$betais), matrix(rep(0, k * m)))
   
@@ -44,18 +55,18 @@ calculate_sic_update <- function(
     cbind(-diag(rep(1, k * m)), kronecker(matrix(rep(1, m)), diag(rep(1, k))))
   )
 
-  Psi_star <- bind_cols(
+  Psi_star <- dplyr::bind_cols(
       sst_update$simulation$means %>% dplyr::select(-sst), 
-      tibble(sst = Xstar)
+      dplyr::tibble(sst = Xstar)
     ) %>%
-    arrange(time, lon, lat) %>%
-    mutate(sst = ifelse(sst < spline_params$bounds[1], spline_params$bounds[1], sst)) %>%
+    dplyr::arrange(time, lon, lat) %>%
+    dplyr::mutate(sst = ifelse(sst < spline_params$bounds[1], spline_params$bounds[1], sst)) %>%
     create_psii(spline_params)    
 
   base::cat(base::sprintf("\r Calculating first update            "))
 
   # Updates
-  V1inv <- solve(Xhat %*% varB %*% Matrix::t(Xhat) + varR)
+  V1inv <- Matrix::solve(Xhat %*% varB %*% Matrix::t(Xhat) + varR)
   
   adj_exp_B <- varB %*% Matrix::t(Xhat) %*% V1inv %*% Bhat
   adj_var_B <- varB - varB %*% Matrix::t(Xhat) %*% V1inv %*% Xhat %*% varB
@@ -73,7 +84,7 @@ calculate_sic_update <- function(
 
   corW <- coords %>%
     dplyr::select(lon, lat) %>%
-    arrange(lon, lat) %>%
+    dplyr::arrange(lon, lat) %>%
     as.matrix() %>%
     fields::rdist.earth(R = 1) %>% 
     wendland(ptmp[1], ptmp[2], ptmp[3], ptmp[4]) %>%
@@ -84,24 +95,24 @@ calculate_sic_update <- function(
   ptmp <- sic_prior_params$varU_params
 
   varUi <- coords %>%
-    arrange(lon, lat) %>%
+    dplyr::arrange(lon, lat) %>%
     as.matrix() %>%
     fields::rdist.earth(R = 1) %>% 
     wendland(ptmp[1], ptmp[2], ptmp[3], ptmp[4]) %>%
     Matrix::Matrix()
 
-  varU <- bdiag(varUi, varUi, varUi, varUi, varUi)
+  varU <- Matrix::bdiag(varUi, varUi, varUi, varUi, varUi)
 
-  varW <- Matrix(diag(sic_data$sd)) %*% corW %*% Matrix(diag(sic_data$sd))
+  varW <- Matrix::Matrix(diag(sic_data$sd)) %*% corW %*% Matrix::Matrix(diag(sic_data$sd))
   varDisc <- Psi_star %*% 
     (varU + betais$Theta %*% adj_var_Mbeta %*% Matrix::t(betais$Theta)) %*% 
     Matrix::t(Psi_star)
-  V2_inv <- solve(Hy %*% varDisc %*% Matrix::t(Hy) + varW + diag(rep(1e-8, nrow(varW))))
+  V2_inv <- Matrix::solve(Hy %*% varDisc %*% Matrix::t(Hy) + varW + diag(rep(1e-8, nrow(varW))))
 
   base::cat(base::sprintf("\r Calculating second update (exp)            "))
 
   E_ice_update <- Mx + varDisc %*% Matrix::t(Hy) %*% V2_inv %*% 
-    (Matrix(sic_data$ice_meas) - (Hy %*% Mx))
+    (Matrix::Matrix(sic_data$ice_meas) - (Hy %*% Mx))
 
   base::cat(base::sprintf("\r Calculating second update (var)            "))
 # check math here
@@ -111,12 +122,12 @@ calculate_sic_update <- function(
   V_ice_update <- Psi_star %*% tmp3 %*% Matrix::t(Psi_star)
 
   update_tbl <- sst_update$simulation$means %>%
-    arrange(time, lon, lat) %>%
-    mutate(
+    dplyr::arrange(time, lon, lat) %>%
+    dplyr::mutate(
       Eadj1 = as.numeric(Mx),
       Vadj1 = Matrix::diag(varDisc),
       Eadj2 = as.numeric(E_ice_update),
-      Vadj2 = diag(V_ice_update),
+      Vadj2 = Matrix::diag(V_ice_update),
       Eadj1 = ifelse(Eadj1 > 1, 1, Eadj1),
       Eadj1 = ifelse(Eadj1 < 0, 0, Eadj1),
       Eadj2 = ifelse(Eadj2 > 1, 1, Eadj2),

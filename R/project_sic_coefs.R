@@ -43,16 +43,16 @@ project_sic_coefs <- function(
     )[,c(2,3)]
   ) %>%
     dplyr::left_join(ice_fits, by = c("lat", "lon", "model", "idx")) %>%
-    group_by(idx, model) %>%
-    arrange(lon, lat) %>%
-    summarise(
+    dplyr::group_by(idx, model) %>%
+    dplyr::arrange(lon, lat) %>%
+    dplyr::summarise(
       lon = lon, lat = lat, beta = as.numeric(W %*% beta), 
       .groups = "keep"
     ) %>%
-    rowwise() %>%
-    mutate(beta = ifelse(is.na(beta), spline_params$prior[idx], beta)) %>%
-    arrange(lon, lat) %>%
-    ungroup()
+    dplyr::rowwise() %>%
+    dplyr::mutate(beta = ifelse(is.na(beta), spline_params$prior[idx], beta)) %>%
+    dplyr::arrange(lon, lat) %>%
+    dplyr::ungroup()
 
   return(all_ice_fits)
 

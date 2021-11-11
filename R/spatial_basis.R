@@ -8,7 +8,7 @@
 #' @export
 create_psii <- function(model_tmp, spline_params){
   ntime <- 12
-  ns <- nrow(model_tmp %>% filter(time == 1))
+  ns <- nrow(model_tmp %>% dplyr::filter(time == 1))
   nl <- length(spline_params$prior_exp)
 
   options(warn = -1)
@@ -16,11 +16,16 @@ create_psii <- function(model_tmp, spline_params){
     rbind,
     lapply(1:12, function(j){
       zero_idx <- which(
-        model_tmp %>% filter(time == j) %>% arrange(lon, lat) %>% pull(sst) > 0
+        model_tmp %>% dplyr::filter(time == j) %>% 
+          dplyr::arrange(lon, lat) %>% 
+          dplyr::pull(sst) > 0
       )
 
       phi_tmp <- calc_X(
-        model_tmp %>% filter(time == j) %>% arrange(lon, lat) %>% pull(sst), 
+        model_tmp %>% 
+          dplyr::filter(time == j) %>% 
+          dplyr::arrange(lon, lat) %>% 
+          dplyr::pull(sst), 
         spline_params
       )
 
@@ -30,7 +35,7 @@ create_psii <- function(model_tmp, spline_params){
         lapply(1:nl, function(i){
           diag(phi_tmp[,i])
         })
-      ) %>% Matrix()
+      ) %>% Matrix::Matrix()
     })
   )
   options(warn = 0)
@@ -46,19 +51,19 @@ create_psii <- function(model_tmp, spline_params){
 #' @export
 create_theta <- function(all_fits, idx_select){
   proj_values <- all_fits %>%
-    filter(idx == idx_select) %>%
-    pivot_wider(names_from = model, values_from = beta) %>%
-    arrange(lon, lat) %>%
+    dplyr::filter(idx == idx_select) %>%
+    tidyr::pivot_wider(names_from = model, values_from = beta) %>%
+    dplyr::arrange(lon, lat) %>%
     dplyr::select(-lon, -lat, -idx) %>%
     as.matrix()
 
-  proj_mean <- rowMeans(proj_values)
+  proj_mean <- base::rowMeans(proj_values)
 
   m <- ncol(proj_values)
 
   list(
     mean = proj_mean,
-    theta = svd(proj_values - proj_mean)$u[, 1:(m-1)],
-    lambda = svd(proj_values - proj_mean)$d[1:(m-1)] 
+    theta = base::svd(proj_values - proj_mean)$u[, 1:(m-1)],
+    lambda = base::svd(proj_values - proj_mean)$d[1:(m-1)] 
   )
 }

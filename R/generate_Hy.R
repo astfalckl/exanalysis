@@ -8,8 +8,8 @@
 generate_Hy <- function(coords, ns){
 
   NS_id <- coords %>%
-    arrange(lon, lat) %>%
-    mutate(id = ifelse(lat < 0, "S", "N"))
+    dplyr::arrange(lon, lat) %>%
+    dplyr::mutate(id = ifelse(lat < 0, "S", "N"))
 
   south_idx <- which(NS_id$id == "S")
   north_idx <- which(NS_id$id == "N")
@@ -20,10 +20,10 @@ generate_Hy <- function(coords, ns){
   south_incidence[south_idx] <- 1
   north_incidence[north_idx] <- 1
 
-  south_mat <- Diagonal(ns, south_incidence)
-  north_mat <- Diagonal(ns, north_incidence)
+  south_mat <- Matrix::Diagonal(ns, south_incidence)
+  north_mat <- Matrix::Diagonal(ns, north_incidence)
 
-  zero_mat <- Matrix(matrix(rep(0, ns^2), nrow = ns))
+  zero_mat <- Matrix::Matrix(matrix(rep(0, ns^2), nrow = ns))
 
   cbind(
     zero_mat, north_mat, zero_mat, zero_mat, zero_mat, zero_mat,

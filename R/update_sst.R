@@ -60,12 +60,12 @@ calculate_sst_update <- function(
 	Vt <- varT
 
 	update_tbl <- simulation$means %>%
-		rename(Eadj1 = sst) %>%
-		mutate(
-			Vadj1 = rep(base::diag(as.matrix(varYS)), each = 12),
-			Eadj2 = as.numeric(E),
-			Eadj2 = ifelse(Eadj2 < sst_min, sst_min, Eadj2),
-			Vadj2 = rep(base::diag(as.matrix(Vs)), each = 12)
+		dplyr::rename(Eadj1 = sst) %>%
+		dplyr::mutate(
+			Vadj1 = base::rep(base::diag(base::as.matrix(varYS)), each = 12),
+			Eadj2 = base::as.numeric(E),
+			Eadj2 = base::ifelse(Eadj2 < sst_min, sst_min, Eadj2),
+			Vadj2 = base::rep(base::diag(base::as.matrix(Vs)), each = 12)
 		)
 
 	return(
