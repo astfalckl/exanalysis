@@ -19,6 +19,7 @@ and load:
 
 ``` r
 library(exanalysis)
+library(tidyverse)
 ```
 
 # Data

@@ -27,9 +27,6 @@ and load:
 
 ```{r warning = FALSE, message = FALSE}
 library(exanalysis)
-```
-
-```{r warning = FALSE, echo = FALSE, message = FALSE}
 library(tidyverse)
 ```
 
