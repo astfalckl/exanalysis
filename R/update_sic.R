@@ -56,8 +56,8 @@ calculate_sic_update <- function(
   )
 
   Psi_star <- dplyr::bind_cols(
-      sst_update$simulation$means %>% dplyr::select(-sst), 
-      dplyr::tibble(sst = Xstar)
+      sst_update$simulation$means, 
+      dplyr::tibble(Xstar = Xstar)
     ) %>%
     dplyr::arrange(time, lon, lat) %>%
     dplyr::mutate(sst = ifelse(sst < spline_params$bounds[1], spline_params$bounds[1], sst)) %>%

@@ -10,6 +10,11 @@
 #' Proxy-reconstructions of paleo-SST data, predominantly from the MARGO project.
 "sst_data"
 
+#' Winter sea-ice extents
+#' 
+#' Winter sea-ice extents
+"wsi_extent"
+
 #' SIC Data
 #' 
 #' binary estimates of SIC inferred from Northern and Southern hemisphere maximum sea-ice extents

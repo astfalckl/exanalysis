@@ -32,7 +32,7 @@ calculate_sst_update <- function(
 
 	varMs <- matrix(0, nrow = simulation$n, ncol = simulation$n)
 	if(incl_varM){varMs <- calculate_Ms(simulation)}
-	varYS <- varS + M_scale/2 * Matrix(varMs)
+	varYS <- varS + M_scale/2 * Matrix::Matrix(varMs)
 
 	one <- matrix(1/simulation$ntime, nrow = simulation$ntime, ncol = 1)
 
@@ -40,7 +40,7 @@ calculate_sst_update <- function(
 
 	# HvarY <- H_list$Hs %*% rbind(varYS, varYS)
 	HsvarYs <- H_list$Hs %*% rbind(varYS, varYS)
-	HvarY <- kronecker(HsvarYs, t(one) %*% varT)
+	HvarY <- ?kronecker(HsvarYs, t(one) %*% varT)
 
 	HvarYH <- H_list$Hs %*% 
 		kronecker(matrix(1, nrow = 2, ncol = 2), varYS) %*% 
