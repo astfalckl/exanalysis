@@ -40,7 +40,7 @@ calculate_sst_update <- function(
 
 	# HvarY <- H_list$Hs %*% rbind(varYS, varYS)
 	HsvarYs <- H_list$Hs %*% rbind(varYS, varYS)
-	HvarY <- ?kronecker(HsvarYs, t(one) %*% varT)
+	HvarY <- kronecker(HsvarYs, t(one) %*% varT)
 
 	HvarYH <- H_list$Hs %*% 
 		kronecker(matrix(1, nrow = 2, ncol = 2), varYS) %*% 
