@@ -8,7 +8,9 @@
 #' @return list with sic updates for each parameter
 #' @export
 calculate_sic_update <- function(
-  sst_update, spline_params, sic_prior_params, betais, Xstar, sic_data
+  sst_update, spline_params, sic_prior_params, 
+  betais, Xstar, sic_data,
+  calculate_ind_updates = TRUE
 ){
 
   base::cat(base::sprintf("\r Setting up matrices            "))
@@ -44,9 +46,10 @@ calculate_sic_update <- function(
       list() %>% rep(m+1)
   )
   varB <- varM + Matrix::bdiag(R_list)
-  # varR <- Matrix::bdiag(Matrix::bdiag(rep(list(var_Rhat), m)), Matrix::bdiag(rep(list(var_Rbeta), m)))
-  # varR <- Matrix::bdiag(Matrix::bdiag(var_Rhats), Matrix::bdiag(rep(list(var_Rbeta), m)))
-  varR <- Matrix::bdiag(0.10 * Matrix::bdiag(var_Rhats), Matrix::bdiag(rep(list(var_Rbeta), m)))
+  varR <- Matrix::bdiag(
+    Matrix::bdiag(var_Rhats), 
+    Matrix::bdiag(rep(list(var_Rbeta), m))
+  )
 
   Bhat <- rbind(do.call(rbind, betais$betais), matrix(rep(0, k * m)))
   
@@ -60,7 +63,9 @@ calculate_sic_update <- function(
       dplyr::tibble(Xstar = Xstar)
     ) %>%
     dplyr::arrange(time, lon, lat) %>%
-    dplyr::mutate(sst = ifelse(sst < spline_params$bounds[1], spline_params$bounds[1], sst)) %>%
+    dplyr::mutate(
+      sst = ifelse(sst < spline_params$bounds[1], spline_params$bounds[1], sst)
+    ) %>%
     create_psii(spline_params)    
 
   base::cat(base::sprintf("\r Calculating first update            "))
@@ -74,9 +79,34 @@ calculate_sic_update <- function(
   adj_exp_Mbeta <- tail(as.numeric(adj_exp_B), k)
   adj_var_Mbeta <- adj_var_B[(m*k+1):((m+1)*k), (m*k+1):((m+1)*k)]
 
+  if(calculate_ind_updates){
+
+    adj_exp_spline <- lapply(1:m, function(i){
+      betais$Theta %*% adj_exp_B[((i-1)*60+1):(i*60)] + betais$beta_mean
+    }) %>% purrr::reduce(cbind)
+
+    adj_var_spline <- lapply(1:m, function(i){
+      base::cat(base::sprintf("\r Calculating individual updates %i/%i         ", i, m))
+      Matrix::diag(betais$Theta %*% adj_var_B[((i-1)*60+1):(i*60), ((i-1)*60+1):(i*60)] %*% Matrix::t(betais$Theta))
+    }) %>% purrr::reduce(cbind)
+
+    adj_exp_spline_tbl <- bind_cols(
+      lapply(1:nl, function(i){
+      coords %>% dplyr::arrange(lon, lat)
+    }) %>% bind_rows(),
+      dplyr::as_tibble(as.matrix(adj_exp_spline))
+    )
+
+    adj_var_spline_tbl <- bind_cols(
+      lapply(1:nl, function(i){
+      coords %>% dplyr::arrange(lon, lat)
+    }) %>% bind_rows(),
+      dplyr::as_tibble(as.matrix(adj_var_spline))
+    )  
+
+  }
+
   Mx <- Psi_star %*% (betais$Theta %*% adj_exp_Mbeta + betais$beta_mean)
-  # Vadj1 <- Psi_star %*% betais$Theta %*% adj_var_Mbeta %*% 
-  #       Matrix::t(betais$Theta) %*% Matrix::t(Psi_star)
 
   base::cat(base::sprintf("\r Calculating second update                 "))
 
@@ -134,11 +164,28 @@ calculate_sic_update <- function(
       Eadj2 = ifelse(Eadj2 < 0, 0, Eadj2)
     )
 
-  list(
-    data = sic_data,
-    E = E_ice_update,
-    V = V_ice_update,
-    update_tbl = update_tbl
-  )
+  if(calculate_ind_updates){
+     
+    list(
+      data = sic_data,
+      adj_exp_spline_tbl = adj_exp_spline_tbl,
+      adj_var_spline_tbl = adj_var_spline_tbl,
+      E = E_ice_update,
+      V_param_update = tmp3,
+      V = V_ice_update,
+      update_tbl = update_tbl
+    ) %>% return()
+
+  } else {
+    
+    list(
+      data = sic_data,
+      E = E_ice_update,
+      V_param_update = tmp3,
+      V = V_ice_update,
+      update_tbl = update_tbl
+    )
+
+  }
 
 }
