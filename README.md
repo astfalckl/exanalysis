@@ -4,7 +4,9 @@
 This is the accompanying package to “Coexchangeable process modelling
 for uncertainty quantification in joint climate reconstruction”. This
 <tt>.rmd</tt> file pre-computes some results; to run the analysis from
-scratch look in <tt>run\_analysis.R</tt>.
+scratch look at the top section of <tt>run_analysis.R</tt>. Relatedly,
+<tt>run_analysis.R</tt> also contains all code to generate the paper’s
+figures.
 
 # Installation
 
@@ -25,25 +27,55 @@ library(tidyverse)
 # Data
 
 The package ships with a number of <tt>.rds</tt> files that contain the
-data used in the paper. Namely,
+data used in the paper. <tt>sst_data</tt> contains the proxy
+reconstructions of SST (note the pseudo-observations mentioned in
+Section 4.2.1 are also included here). The primary data source is [the
+MARGO project](https://doi.pangaea.de/10.1594/PANGAEA.733406) with some
+data supplemented from [Benz et
+al. (2016)](https://www.sciencedirect.com/science/article/pii/S0277379116302062).
+The data structure has five components:
 
-  - <tt>model\_data</tt> that contains the PMIP simulation outputs of
-    SST and SIC,
-  - <tt>sst\_data</tt> that contains proxy reconstructions of SST (note
-    the pseudo-observations mentioned in Section 4.2.1 are included
-    here), and
-  - <tt>sic\_data</tt> that contains binary estimates of SIC inferred
-    from Northern and Southern hemisphere maximum sea-ice extents.
+- <tt>data</tt> that contains the latitude, logitude, SST proxy
+  reconstructions, reliability and sd (as listed in the MARGO project),
+  proxy source, and an identifier of annual or summer mean value.
+- <tt>coords</tt> is simply the coordinate of the SST data subsetted
+  into a seperate tibble used for plotting.
+- <tt>B</tt> and <tt>varB</tt> are the belief specifications documented
+  in Section~5.1.
+- <tt>n</tt> is the number of data points used as a global parameter in
+  the statistical analysis.
 
-<!-- ![SST Data](images/sst_data_plot.png) -->
+<tt>sic_data</tt> contains the binary observed sea ice values at each of
+the model spatial locations. Finally, <tt>model_data</tt> contains the
+output of the multi-model ensemble, projected onto the FAMOUS ocean
+grid. The data structure has seven components:
+
+- <tt>data</tt> that contains latitude, longitude, time instance, SST
+  and SIC values and the MME member.
+- <tt>means</tt> that contains the MME’s mean SST value (i.e. $M_X$ in
+  the paper).
+- <tt>mask</tt> masks the ocean output from the global spatial grid;
+  this is used for plotting.
+- <tt>coords</tt> the model’s oceanic spatial coordinates.
+- <tt>n</tt>, <tt>ntime</tt> and <tt>m</tt> are global parameters of
+  number of spatial locations, number of temporal locations and number
+  of MME members.
+
+These three data objects can be viewed by running
+
+``` r
+str(sst_data, give.attr = FALSE)
+str(sic_data, give.attr = FALSE)
+str(model_data, give.attr = FALSE)
+```
 
 # Sea-surface temperature
 
 To calculate the SST belief updates detailed in Section 4.2.1. we use
-two functions. The first, <tt>generate\_Hx()</tt>, calculates \(H_x\)
-and the second, <tt>calculate\_sst\_update()</tt>, calculates the belief
+two functions. The first, <tt>generate_Hx()</tt>, calculates $H_x$ and
+the second, <tt>calculate_sst_update()</tt>, calculates the belief
 updates. Our prior belief specifications are stored as a tibble in
-<tt>params\_prior</tt>.
+<tt>params_prior</tt>.
 
 ``` r
 H_list <- generate_Hx(model_data, sst_data)
@@ -64,8 +96,8 @@ sst_update <- calculate_sst_update(
 
 Calculating SIC belief updates require a bit more involvement than the
 SST updates. First, we set the spline basis functions in the
-<tt>spline\_params</tt> objects. The \(\hat{\beta}_i\) are calculated
-from <tt>project\_betais</tt>.
+<tt>spline_params</tt> objects. The $\hat{\beta}_i$ are calculated from
+<tt>project_betais</tt>.
 
 ``` r
 spline_params <- list(
