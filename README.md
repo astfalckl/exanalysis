@@ -79,14 +79,9 @@ updates. Our prior belief specifications are stored as a tibble in
 is run as
 
 ``` r
-h_list <- generate_Hx(model_data, sst_data)
+sst_prior_params <- dplyr::tibble(tau = 6, c = 0.92, kappa = 1.61, alpha2 = 1)
 
-sst_prior_params <- dplyr::tibble(
-  tau = 6,
-  c = 0.92,
-  kappa = 1.61,
-  alpha2 = 1
-)
+h_list <- generate_Hx(model_data, sst_data)
 
 sst_update <- calculate_sst_update(
   model_data, sst_data, h_list, sst_prior_params
@@ -106,19 +101,24 @@ The first level items are
 - <tt>simulation</tt>, the model data.
 - <tt>proxy</tt>, the reconstructed proxy data.
 - <tt>E</tt>, <tt>Vs</tt> and <tt>Vt</tt>, the adjusted expectation and
-  variances (decomposed into spatial anf temporal components) stored as
+  variances (decomposed into spatial and temporal components) stored as
   matrix objects for future calculations.
 - <tt>update_tbl</tt> is the main results of the analysis and is a
   tibble that stores first and second adjusted expectations and marginal
   variances linked to the spatio-temporal locations. This tibble is used
-  to plot the Figure 3.
+  to plot Figure 3.
 
 # Update sea-ice concentration
 
 Calculating SIC belief updates require a bit more involvement than the
 SST updates. First, we set the spline basis functions in the
-<tt>spline_params</tt> objects. The $\hat{\beta}_i$ are calculated from
-<tt>project_betais</tt>.
+<tt>spline_params</tt> objects and specify the prior specfications in
+<tt>sic_prior_params</tt>. As we model SIC as a function of SST, we also
+require a spatio-temporal SST field; as detailed in the main body of the
+paper, here we use simply use the adjusted expectation, and call this
+quantity <tt>sst_field</tt>. The projection $\hat{\beta}_i$ are
+calculated from <tt>project_betais()</tt> and finally, the main updates
+of SIC beliefs are calculated in <tt>calculate_sic_update()</tt>.
 
 ``` r
 spline_params <- list(
@@ -128,16 +128,30 @@ spline_params <- list(
   prior_exp = c(0.16, 0.47, 0.27, 0.1, 0)
 )
 
-betais <- project_betais(sst_update, spline_params)
-
-Xstar <- as.numeric(sst_update$E)
-
 sic_prior_params <- list(
   corW_params = c(6, 4, 1, 0),
   varU_params = c(6, 4, 0.3, 0)
 )
 
+sst_field <- as.numeric(sst_update$update_tbl$Eadj2)
+
+betais <- project_betais(sst_update, spline_params)
+
 sic_update <- calculate_sic_update(
-  sst_update, spline_params, sic_prior_params, betais, Xstar, sic_data
+  sst_update, spline_params, sic_prior_params, betais, sst_field, sic_data
 )
 ```
+
+The output <tt>sic_update</tt> contains
+
+- <tt>data</tt>, the SIC binary data.
+- <tt>adj_exp_spline_tbl</tt> and <tt>adj_exp_spline_tbl</tt> the
+  adjusted expectations and variances of the spline coefficients. These
+  are used to generate the individual spline fits in Figure 4.
+- <tt>E</tt>, <tt>V</tt> and <tt>V_param_update</tt>, the adjusted
+  expectation and variances (of the parameter coeffecients and of the
+  spatio-temporal SIC values) stored as matrix objects.
+- <tt>update_tbl</tt> is, again, the main results of the analysis.
+  Similarly to SST, this tibble stores first and second adjusted
+  expectations and marginal variances of SIC linked to the
+  spatio-temporal locations. This tibble is used to plot Figure 5.

@@ -15,14 +15,9 @@ file_path <- "paper_plots/"
 # ------------------------- Do analysis in paper -------------------------------
 # ------------------------------------------------------------------------------
 
-h_list <- generate_Hx(model_data, sst_data)
+sst_prior_params <- dplyr::tibble(tau = 6, c = 0.92, kappa = 1.61, alpha2 = 1)
 
-sst_prior_params <- dplyr::tibble(
-  tau = 6,
-  c = 0.92,
-  kappa = 1.61,
-  alpha2 = 1
-)
+h_list <- generate_Hx(model_data, sst_data)
 
 sst_update <- calculate_sst_update(
   model_data, sst_data, h_list, sst_prior_params
@@ -35,17 +30,17 @@ spline_params <- list(
   prior_exp = c(0.16, 0.47, 0.27, 0.1, 0)
 )
 
-betais <- project_betais(sst_update, spline_params)
-
-x_star <- as.numeric(sst_update$update_tbl$Eadj2)
-
 sic_prior_params <- list(
   corW_params = c(6, 4, 1, 0),
   varU_params = c(6, 4, 0.3, 0)
 )
 
+sst_field <- as.numeric(sst_update$update_tbl$Eadj2)
+
+betais <- project_betais(sst_update, spline_params)
+
 sic_update <- calculate_sic_update(
-  sst_update, spline_params, sic_prior_params, betais, x_star, sic_data
+  sst_update, spline_params, sic_prior_params, betais, sst_field, sic_data
 )
 
 str(sst_update)
