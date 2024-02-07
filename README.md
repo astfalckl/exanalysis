@@ -155,3 +155,12 @@ The output <tt>sic_update</tt> contains
   Similarly to SST, this tibble stores first and second adjusted
   expectations and marginal variances of SIC linked to the
   spatio-temporal locations. This tibble is used to plot Figure 5.
+
+# A note on couple climate model runs
+
+The final secton of the paper contains outputs from a coupled climate
+model. Providing code to run the model is not feasible as it requires
+access to local supercomputing resources and the raw outputs are much
+too large to store on github. Instead we have included the model outputs
+at four distinct locations (as discussed in the paper) in the folder.
+The unique model identification codes are included in the csv headers.
