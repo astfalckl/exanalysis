@@ -7,13 +7,16 @@
 create_sst_data_object(data, coords, B = NULL, varB = NULL)
 }
 \arguments{
-\item{data}{a tibble of sst data}
+\item{data}{a tibble of sst data. Requires the columns lat, lon, sst_obs,
+sd and type ('ann' or 'jfm').}
 
-\item{coords}{the coordinates of the data}
+\item{coords}{the spatial coordinates of the data}
 
-\item{B}{a matrix of expected bias (if included)}
+\item{B}{a matrix of expected bias (if included). Required to calculate
+updates.}
 
-\item{varB}{a matrix of bias variance (if included)}
+\item{varB}{a matrix of bias variance (if included). Required to calculate
+updates.}
 }
 \value{
 Returns a sst_data object

@@ -7,9 +7,11 @@
 generate_Hx(simulation, proxy)
 }
 \arguments{
-\item{simulation}{A sst_sim object containing the sst simulations}
+\item{simulation}{A sst_sim object containing the sst simulations.
+Such an object can be created using the create_sst_sim_object() command.}
 
-\item{proxy}{A sst_data object containing the proxy data}
+\item{proxy}{A sst_data object containing the proxy data. Such and object
+can be created using the create_sst_data_object() command.}
 }
 \value{
 Returns a list of Hs, Hs_collapse (reshuffled Hs to make some

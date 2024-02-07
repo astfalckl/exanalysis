@@ -1,10 +1,12 @@
 
 #' Generates the spatial and temporal incidence matrices
 #'
-#' @param simulation A sst_sim object containing the sst simulations
-#' @param proxy A sst_data object containing the proxy data
+#' @param simulation A sst_sim object containing the sst simulations.
+#' Such an object can be created using the create_sst_sim_object() command.
+#' @param proxy A sst_data object containing the proxy data. Such and object
+#' can be created using the create_sst_data_object() command.
 #'
-#' @return Returns a list of Hs, Hs_collapse (reshuffled Hs to make some 
+#' @return Returns a list of Hs, Hs_collapse (reshuffled Hs to make some
 #' calculation easier), Ht and H.
 #' @export
 generate_Hx <- function(simulation, proxy){

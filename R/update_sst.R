@@ -1,17 +1,23 @@
 
 #' Calculate the SST update
 #' 
-#' This requires the simulations, the data, the incidence matrices, and the 
-#' trained parameters
+#' This requires the simulations, the data, the incidence matrices, and the
+#' analysis parameters
 #'
-#' @param simulation a sst_sim object containing the sst simulations
-#' @param proxy a sst_data object containing the proxy data
-#' @param H_list the output from generate_H() containing a list of the 
-#' incidence matrices
-#' @param params fit parameters from train_params()
-#' @param incl_varM include the varM matrix in the calculation
+#' @param simulation A sst_sim object containing the sst simulations.
+#' Such an object can be created using the create_sst_sim_object() command.
+#' @param proxy A sst_data object containing the proxy data. Such and object
+#' can be created using the create_sst_data_object() command.
+#' @param H_list the output from generate_Hx() containing a list of the
+#' incidence matrices.
+#' @param params a tibble of parameters for the analysis with columns tau, c
+#' kappa and alpha. These parameters are defined in Section 5.2 of the paper.
+#' @param incl_varM include the varM matrix in the calculation.
+#' @param sst_min set minimum value of SST. The default value is the
+#' scientifically understood value. We scale MME outputs to this value (in
+#' practice this makes miniscule difference to the analysis).
 #'
-#' @return Returns loss
+#' @return Returns a sst_reconstruction object.
 #' @export
 calculate_sst_update <- function(
 	simulation, proxy, H_list, params, incl_varM = FALSE, sst_min = -1.92

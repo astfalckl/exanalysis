@@ -7,7 +7,14 @@
 create_sst_sim_object(data, means, coords)
 }
 \arguments{
-\item{object}{List with elements XYZ}
+\item{data}{a tibble containing the simulation data. Expected column names
+are lat, lon, time, sst, ice and model. These are explained further
+in the package README.}
+
+\item{means}{the spatio-temporal SST means, i.e. averages over the MME for
+each location in space and time.}
+
+\item{coords}{the unique spatial lat/lon coords.}
 }
 \value{
 Returns a sst_sim object

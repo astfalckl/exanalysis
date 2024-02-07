@@ -108,20 +108,3 @@ The output <tt>sic_update</tt> contains
 * <tt>adj_exp_spline_tbl</tt> and <tt>adj_exp_spline_tbl</tt> the adjusted expectations and variances of the spline coefficients. These are used to generate the individual spline fits in Figure 4.
 * <tt>E</tt>, <tt>V</tt> and <tt>V_param_update</tt>, the adjusted expectation and variances (of the parameter coeffecients and of the spatio-temporal SIC values) stored as matrix objects.
 * <tt>update_tbl</tt> is, again, the main results of the analysis. Similarly to SST, this tibble stores first and second adjusted expectations and marginal variances of SIC linked to the spatio-temporal locations. This tibble is used to plot Figure 5.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

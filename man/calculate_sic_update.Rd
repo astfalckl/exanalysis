@@ -10,17 +10,35 @@ calculate_sic_update(
   sic_prior_params,
   betais,
   Xstar,
-  sic_data
+  sic_data,
+  calculate_ind_updates = TRUE
 )
 }
 \arguments{
-\item{spline_params}{chosen spline parameters. This is a list with elements
-bounds, knots, degree, and prior_exp}
+\item{sst_update}{an sst_reconstruction object generated from
+calculate_sst_update(). This contains the results of the SST updates.}
 
-\item{all_ice_fits}{sic coefficient projections from project_sic_coefs()}
+\item{spline_params}{prior specifications of spline functions. A named-list
+with names bounds, knots, degree and prior_exp (default coefficients).}
+
+\item{sic_prior_params}{a list containing the parameters for corW and varU.}
+
+\item{betais}{the output list generated from project_betais()}
+
+\item{Xstar}{the SST value with which to run the analysis. In the paper we
+use the SST adjusted expected.}
+
+\item{sic_data}{a tibble containg the binary observed sea ice values at
+each of the model spatial locations.}
+
+\item{calculate_ind_updates}{boolean value whether to calculate the updates
+for each of the beta_i. This is required, for example, to generate Figure 4
+in the paper. However, if we are only interested in the coexchnageable model
+updates then we can save some computation by only computing updates on
+M_beta.}
 }
 \value{
-list with sic updates for each parameter
+list with sic updates.
 }
 \description{
 Calculates BL update of the SIC parameters

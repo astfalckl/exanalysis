@@ -1,10 +1,12 @@
 
 #' Find the beta projection
 #'
-#' @param sst_update a sst_sim object containing the sst simulations
-#' @param spline_params prior spline specifications
+#' @param sst_update an sst_reconstruction object generated from
+#' calculate_sst_update(). This contains the results of the SST updates.
+#' @param spline_params prior specifications of spline functions. A named-list
+#' with names bounds, knots, degree and prior_exp (default coefficients).
 #'
-#' @return list of betais
+#' @return list containing betais, Theta and the mean of the betais.
 #' @export
 project_betais <- function(sst_update, spline_params){
 

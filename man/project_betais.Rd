@@ -7,12 +7,14 @@
 project_betais(sst_update, spline_params)
 }
 \arguments{
-\item{sst_update}{a sst_sim object containing the sst simulations}
+\item{sst_update}{an sst_reconstruction object generated from
+calculate_sst_update(). This contains the results of the SST updates.}
 
-\item{spline_params}{prior spline specifications}
+\item{spline_params}{prior specifications of spline functions. A named-list
+with names bounds, knots, degree and prior_exp (default coefficients).}
 }
 \value{
-list of betais
+list containing betais, Theta and the mean of the betais.
 }
 \description{
 Find the beta projection

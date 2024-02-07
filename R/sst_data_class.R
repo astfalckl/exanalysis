@@ -3,10 +3,13 @@
 #' 
 #' This creates the object that holds the sst_data results, i.e., the Z
 #'
-#' @param data a tibble of sst data
-#' @param coords the coordinates of the data
-#' @param B a matrix of expected bias (if included)
-#' @param varB a matrix of bias variance (if included)
+#' @param data a tibble of sst data. Requires the columns lat, lon, sst_obs,
+#' sd and type ('ann' or 'jfm').
+#' @param coords the spatial coordinates of the data
+#' @param B a matrix of expected bias (if included). Required to calculate
+#' updates.
+#' @param varB a matrix of bias variance (if included). Required to calculate
+#' updates.
 #'
 #' @return Returns a sst_data object
 #' @export
