@@ -1,12 +1,15 @@
+# Libraries needed for analysis
 library(devtools)
 library(tidyverse)
+
+devtools::install_github("astfalckl/exanalysis")
+library(exanalysis)
+
+# Libraries needed for plotting
 library(scico)
 library(patchwork)
 library(sp)
 library(latex2exp)
-
-devtools::install_github("astfalckl/exanalysis")
-library(exanalysis)
 
 # File path to save out images
 file_path <- "paper_plots/"
@@ -45,6 +48,16 @@ sic_update <- calculate_sic_update(
 
 str(sst_update)
 str(sic_update)
+
+# ------------------------------------------------------------------------------
+# ----------------------------- Plot Figures -----------------------------------
+# ------------------------------------------------------------------------------
+
+# ------------------------------------------------------------------------------
+# ------------------------------- Figure 1 -------------------------------------
+# ------------------------------------------------------------------------------
+
+# Figure 1 is a flowchart created using Keynote.
 
 # ------------------------------------------------------------------------------
 # ------------------------------- Figure 2 -------------------------------------
@@ -113,10 +126,10 @@ pseudo_data <- create_sst_data_object(
 )
 
 # Update by the pseudo data
-H_pseudo <- generate_Hx(model_data, pseudo_data)
+h_pseudo <- generate_Hx(model_data, pseudo_data)
 
 sst_pseudo <- calculate_sst_update(
-  model_data, pseudo_data, H_pseudo, sst_prior_params, TRUE
+  model_data, pseudo_data, h_pseudo, sst_prior_params, TRUE
 )
 
 # ------------------------------- Figure 3a ------------------------------------
