@@ -6,7 +6,7 @@ for uncertainty quantification in joint climate reconstruction”. This
 <tt>.rmd</tt> file pre-computes some results; to run the analysis from
 scratch look at the top section of <tt>run_analysis.R</tt>. Relatedly,
 <tt>run_analysis.R</tt> also contains all code to generate the paper’s
-figures.
+figures which are also saved in the <tt>paper_plots</tt> folder.
 
 # Installation
 
@@ -46,7 +46,8 @@ The data structure has five components:
   the statistical analysis.
 
 <tt>sic_data</tt> contains the binary observed sea ice values at each of
-the model spatial locations. Finally, <tt>model_data</tt> contains the
+the model spatial locations. <tt>sst_data</tt> and <tt>sic_data</tt> are
+used to generate Figure 2. Finally, <tt>model_data</tt> contains the
 output of the multi-model ensemble, projected onto the FAMOUS ocean
 grid. The data structure has seven components:
 
@@ -72,7 +73,7 @@ str(model_data, give.attr = FALSE)
 # Sea-surface temperature
 
 To calculate the SST belief updates detailed in Section 4.2.1. we use
-two functions. The first, <tt>generate_Hx()</tt>, calculates $H_x$ and
+two functions. The first, <tt>generate_Hx()</tt>, calculates $H_x$; and
 the second, <tt>calculate_sst_update()</tt>, calculates the belief
 updates. Our prior belief specifications are stored as a tibble in
 <tt>sst_params_prior</tt>. To generate the SST belief updates, the code
@@ -156,11 +157,12 @@ The output <tt>sic_update</tt> contains
   expectations and marginal variances of SIC linked to the
   spatio-temporal locations. This tibble is used to plot Figure 5.
 
-# A note on couple climate model runs
+# A note on coupled glacier-climate model runs
 
-The final secton of the paper contains outputs from a coupled climate
-model. Providing code to run the model is not feasible as it requires
-access to local supercomputing resources and the raw outputs are much
-too large to store on github. Instead we have included the model outputs
-at four distinct locations (as discussed in the paper) in the folder.
-The unique model identification codes are included in the csv headers.
+The final secton of the paper contains outputs from a coupled
+glacier-climate model. Providing code to run the model is not feasible
+as it requires access to local supercomputing resources and the raw
+outputs are much too large to store on GitHub. Instead we have included
+the model outputs at four distinct locations (as discussed in the paper)
+in the <tt>glacial_runs</tt> folder. The unique model identification
+codes are included in the csv headers.
